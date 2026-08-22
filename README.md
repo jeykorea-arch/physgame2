@@ -2,7 +2,14 @@
 
 고등학교 물리학 II `파동과 물질의 성질` 3차시 WebAR 학습 게임의 구현체. React + TypeScript + Vite 기반 정적 웹앱이다.
 
-상위 PRD·데이터 계약·QA 기준은 `../docs/`, `../data/`, `../qa/`를 따른다.
+**공개 수업 주소: https://jeykorea-arch.github.io/physgame2/**
+
+- 학생: 위 주소에서 차시를 선택하거나 `#/lesson/1`, `#/lesson/2`, `#/lesson/3`으로 바로 접속
+- 교사: https://jeykorea-arch.github.io/physgame2/#/teacher
+- `main` 브랜치에 push하면 GitHub Actions가 자동으로 lint·시험·빌드 후 재배포한다(`.github/workflows/deploy-pages.yml`).
+- 실시간 진행판은 Firebase 설정(저장소 Secrets·Variables)이 없으면 자동으로 꺼져 있고, 로컬 저장·파일 내보내기 방식으로만 동작한다. 켜는 방법은 `firebase/README.md` 참고.
+
+상위 PRD·데이터 계약·QA 기준은 이 저장소가 아니라 `physgame2/docs/`, `physgame2/data/`, `physgame2/qa/`(별도 로컬 작업 폴더)에 있다. 이 저장소는 그중 배포 가능한 웹앱만 담는다.
 
 ## 빠른 시작
 
