@@ -22,7 +22,7 @@ npm run dev
 ## 시험·빌드
 
 ```bash
-npm run test           # Vitest: 과학·AR·진행 복원·URL·실시간 진행판·보안 규칙 시험 — 65개 통과
+npm run test           # Vitest: 과학·AR·진행 복원·URL·실시간 진행판·보안 규칙 시험 — 66개 통과
 npm run lint            # ESLint
 npm run typecheck       # tsc --noEmit
 npm run build           # 콘텐츠 계약 검증 → 정적 빌드(dist/) → dist/version.json 기록
@@ -80,8 +80,9 @@ npm run dev:mobile      # 자체 서명 HTTPS + LAN 접속 — 스마트폰 실�
   현장 확인이 남아 있다(`prefers-reduced-motion`, 44px 터치 영역, `−/+` 대체 조작 구현).
 - **iOS 홈 화면 아이콘은 SVG만 제공한다.** iOS Safari의 "홈 화면에 추가"는 PNG 아이콘을 더 안정적으로
   지원하므로, 실제 배포 전 PNG 아이콘 추가가 필요할 수 있다.
-- **공개 GitHub Pages는 이전 버전이 배포된 상태다.** 이 수정본은 사용자가 배포를 승인해 `main`에
-  push하기 전까지 공개 주소에 반영되지 않는다. Firebase 실시간 진행판은 환경 설정이 없으면 계속 꺼져 있다.
+- **공개 GitHub Pages와 Firebase 실시간 진행판을 배포했다.** 기존 `physgame`의 `classes` 규칙을
+  보존하면서 `physgame2` 전용 `projectEchoClasses` 규칙을 같은 데이터베이스에 추가했고, 저장소
+  Secrets·Variable로 공개 빌드의 실시간 진행판을 활성화한다.
 
 ## 구조
 

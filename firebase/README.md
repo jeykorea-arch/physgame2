@@ -2,6 +2,10 @@
 
 기본값은 꺼짐이다. 아래를 하지 않아도 앱은 로컬 저장·파일 내보내기로 완전히 동작한다.
 
+현재 공개 배포는 `physgame-live-class-2026` 프로젝트를 기존 `physgame`과 공유한다. 배포 규칙에는
+기존 `classes`와 `physgame2` 전용 `projectEchoClasses`가 함께 있으며, `firebase deploy --only database`
+시 어느 한쪽을 삭제하지 않도록 `database.rules.json` 전체를 유지해야 한다.
+
 ## 1. Firebase 프로젝트 만들기 (직접 해야 하는 단계)
 
 Claude는 여러분의 Google 계정에 로그인할 수 없어 이 단계는 직접 해야 한다.
