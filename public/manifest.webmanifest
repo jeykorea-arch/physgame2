@@ -1,0 +1,14 @@
+{
+  "name": "PROJECT ECHO: 흔적 기록소",
+  "short_name": "PROJECT ECHO",
+  "description": "고등학교 물리학 II 파동과 물질의 성질 3차시 WebAR 학습 게임",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f1424",
+  "theme_color": "#0f1424",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

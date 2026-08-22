@@ -1,0 +1,32 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "classes": {
+      "$classCode": {
+        ".write": "auth != null && ((!data.exists() && newData.child('ownerUid').val() === auth.uid) || data.child('ownerUid').val() === auth.uid)",
+        "ownerUid": {
+          ".validate": "newData.isString() && newData.val() === auth.uid"
+        },
+        "public": {
+          ".read": "auth != null",
+          ".validate": "newData.hasChildren(['lessonId','active','createdAt']) && newData.child('lessonId').isNumber() && newData.child('lessonId').val() >= 1 && newData.child('lessonId').val() <= 3 && newData.child('active').isBoolean() && newData.child('createdAt').isNumber()"
+        },
+        "students": {
+          ".read": "auth != null && root.child('classes').child($classCode).child('ownerUid').val() === auth.uid",
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid && (root.child('classes').child($classCode).child('public').child('active').val() === true || newData.child('connected').val() === false)",
+            ".validate": "newData.hasChildren(['alias','connected','lessonId','phase','mode','completedQuestionCount','score','lastSeenAt']) && newData.child('alias').isString() && newData.child('alias').val().length >= 2 && newData.child('alias').val().length <= 12 && newData.child('connected').isBoolean() && newData.child('lessonId').isNumber() && newData.child('lessonId').val() >= 1 && newData.child('lessonId').val() <= 3 && newData.child('phase').isString() && newData.child('phase').val().length <= 24 && newData.child('mode').isString() && (newData.child('mode').val() === 'ar' || newData.child('mode').val() === 'non-ar') && newData.child('completedQuestionCount').isNumber() && newData.child('completedQuestionCount').val() >= 0 && newData.child('completedQuestionCount').val() <= 4 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 40 && newData.child('lastSeenAt').isNumber()",
+            "answers": {
+              ".validate": "newData.numChildren() <= 4",
+              "$questionId": {
+                ".validate": "newData.hasChildren(['attempt','correct','score','responseCode']) && newData.child('attempt').isNumber() && newData.child('attempt').val() >= 1 && newData.child('attempt').val() <= 3 && newData.child('correct').isBoolean() && newData.child('score').isNumber() && (newData.child('score').val() === 0 || newData.child('score').val() === 5 || newData.child('score').val() === 7 || newData.child('score').val() === 10) && newData.child('responseCode').isString() && newData.child('responseCode').val().length <= 2"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "lessonId": 1,
+  "contentVersion": "project-echo-prd-v1-2026-08-22",
+  "markerVersion": "project-echo-3-lessons-2026-08-22",
+  "storyIntro": "기록소의 음향·광학 센서가 '퍼짐'과 '진동수 변화'를 같은 현상으로 잘못 분류했다. M01을 스캔해 두 현상을 분리하고 흔적을 복원하라.",
+  "recallPrompts": [
+    {
+      "id": "L1-R01",
+      "prompt": "두 스피커가 반대 위상의 소리를 낼 때, 특정 위치에서 일어나는 현상으로 가장 정확한 것은?",
+      "correctChoiceId": "A",
+      "choices": [
+        { "id": "A", "label": "그 위치에서 압력 변화가 상쇄되어 진폭이 작아진다" },
+        { "id": "B", "label": "소리 에너지가 완전히 사라진다" },
+        { "id": "C", "label": "공간 전체에서 소리가 사라진다" },
+        { "id": "D", "label": "그 위치의 주파수가 바뀐다" }
+      ]
+    },
+    {
+      "id": "L1-R02",
+      "prompt": "영의 이중 슬릿 실험에서 밝고 어두운 무늬가 반복되는 이유는?",
+      "correctChoiceId": "A",
+      "choices": [
+        { "id": "A", "label": "경로차에 따라 보강·상쇄 간섭이 번갈아 나타나기 때문" },
+        { "id": "B", "label": "두 슬릿에서 나오는 빛의 세기가 다르기 때문" },
+        { "id": "C", "label": "슬릿마다 빛의 색이 다르기 때문" },
+        { "id": "D", "label": "빛의 속력이 위치마다 다르기 때문" }
+      ]
+    }
+  ],
+  "missions": [
+    {
+      "id": "L1-M1",
+      "title": "좁은 틈을 지난 파동",
+      "arObservationText": "마커 위에서 파면이 좁은 틈을 지나 퍼져나가는 모습을 관찰한다. 틈이 좁을수록 파면이 더 넓게 퍼진다.",
+      "predictionPrompt": "슬릿 폭 a를 더 좁게 만들면 중앙 회절 무늬의 폭은 어떻게 될까?",
+      "predictionChoices": [
+        { "id": "A", "label": "넓어질 것이다" },
+        { "id": "B", "label": "좁아질 것이다" },
+        { "id": "C", "label": "변화가 없을 것이다" }
+      ],
+      "correctPredictionChoiceId": "A",
+      "controlLabel": "단일 슬릿 폭 a",
+      "controlMin": 40,
+      "controlMax": 300,
+      "controlStep": 5,
+      "controlDefault": 150,
+      "controlUnit": "μm",
+      "verificationCaption": "첫 번째 어두운 무늬 조건 a·sinθ = λ. 파장 λ와 화면 거리 D는 고정되어 있다. 이 화면에는 이중 슬릿 간격 d를 넣지 않는다 — d와 a는 다른 변수다.",
+      "estimatedSeconds": 210
+    },
+    {
+      "id": "L1-M2",
+      "title": "움직이는 구조 신호",
+      "arObservationText": "음원이 다가올 때 앞쪽 파면 간격은 좁아지고, 멀어질 때 뒤쪽 파면 간격은 넓어지는 모습을 관찰한다.",
+      "predictionPrompt": "음원이 관찰자에게 다가올 때, 관찰자가 듣는 진동수는 원래 진동수보다 어떻게 될까?",
+      "predictionChoices": [
+        { "id": "A", "label": "높아진다" },
+        { "id": "B", "label": "낮아진다" },
+        { "id": "C", "label": "변화가 없다" }
+      ],
+      "correctPredictionChoiceId": "A",
+      "controlLabel": "음원 속력 v_s",
+      "controlMin": 0,
+      "controlMax": 100,
+      "controlStep": 2,
+      "controlDefault": 34,
+      "controlUnit": "m/s",
+      "verificationCaption": "정지한 공기에 대한 음속 v=340 m/s는 음원의 운동과 무관하게 일정하다. 접근: fo = fs·v/(v−vs), 후퇴: fo = fs·v/(v+vs).",
+      "qualitativeModelNotice": "이 미션은 정지 매질·정지 관찰자·움직이는 음원 조건만 다룬다.",
+      "estimatedSeconds": 210
+    }
+  ],
+  "questions": [
+    {
+      "id": "L1-Q01",
+      "concept": "slit_variables",
+      "prompt": "이중 슬릿 중심 간격 d와 단일 슬릿 폭 a는 각각 어떤 무늬 특성을 결정하는가?",
+      "choices": [
+        { "id": "A", "label": "d는 간섭 무늬 간격을, a는 회절 무늬(외피) 폭을 결정한다" },
+        { "id": "B", "label": "d와 a는 같은 값으로 취급해도 항상 같은 무늬를 만든다" },
+        { "id": "C", "label": "a만 무늬를 결정하고 d는 영향이 없다" },
+        { "id": "D", "label": "d만 무늬를 결정하고 a는 영향이 없다" }
+      ],
+      "correctChoiceId": "A",
+      "correctFeedback": "맞다. 이중 슬릿 중심 간격 d는 간섭 무늬 간격을, 단일 슬릿 폭 a는 회절 무늬 외피 폭을 결정한다. 이 둘은 같은 변수가 아니다.",
+      "incorrectFeedback": {
+        "B": "d와 a를 같은 변수로 다루면 안 된다. 이중 슬릿 간섭 간격은 중심 간격 d가, 회절 무늬 외피 폭은 슬릿 폭 a가 각각 결정한다.",
+        "C": "a는 회절 무늬 폭에 영향을 주지만, 이중 슬릿 간섭 무늬 간격은 중심 간격 d가 결정한다는 점을 놓쳤다.",
+        "D": "d는 간섭 무늬 간격을 결정하지만, 회절 무늬 외피 폭은 슬릿 폭 a가 결정한다는 점을 놓쳤다."
+      },
+      "misconceptionTag": "slit_width_vs_slit_spacing_confusion",
+      "expectedSeconds": 60
+    },
+    {
+      "id": "L1-Q02",
+      "concept": "single_slit_width",
+      "prompt": "단일 슬릿 폭 a를 줄이면 중앙 회절 무늬의 폭은 어떻게 되는가?",
+      "choices": [
+        { "id": "A", "label": "넓어진다" },
+        { "id": "B", "label": "좁아진다" },
+        { "id": "C", "label": "변화가 없다" },
+        { "id": "D", "label": "무늬가 사라진다" }
+      ],
+      "correctChoiceId": "A",
+      "correctFeedback": "맞다. a sinθ=λ에서 a가 작아지면 첫 최소가 나타나는 각도 θ가 커져 중앙 무늬가 넓어진다.",
+      "incorrectFeedback": {
+        "B": "a sinθ=λ를 다시 확인하자. a가 작아지면 sinθ=λ/a가 커져서 오히려 무늬가 넓어진다.",
+        "C": "슬릿 폭은 회절 무늬 폭에 직접 영향을 준다. a가 작아지면 무늬가 넓어진다.",
+        "D": "a가 λ보다 크게 작아지지 않는 한 무늬는 사라지지 않고 넓어진다."
+      },
+      "misconceptionTag": "single_slit_width_direction",
+      "expectedSeconds": 45
+    },
+    {
+      "id": "L1-Q03",
+      "concept": "moving_source_doppler",
+      "prompt": "정지한 공기(음속 340 m/s)에서 1000 Hz 음원이 관찰자를 향해 34 m/s로 접근한다. 관찰자가 듣는 진동수는?",
+      "choices": [
+        { "id": "A", "label": "약 1111 Hz" },
+        { "id": "B", "label": "약 966 Hz" },
+        { "id": "C", "label": "약 1034 Hz" },
+        { "id": "D", "label": "약 909 Hz" }
+      ],
+      "correctChoiceId": "A",
+      "correctFeedback": "맞다. 접근 공식 fo=fs·v/(v−vs)=1000·340/(340−34)≈1111 Hz.",
+      "incorrectFeedback": {
+        "B": "이 값은 공식의 부호를 반대로 적용한 결과에 가깝다. 접근할 때는 분모에서 음원 속력을 뺀다: fo=fs·v/(v−vs).",
+        "C": "속력을 분자에 더하는 근사가 아니라 fo=fs·v/(v−vs) 공식을 그대로 계산해야 한다.",
+        "D": "이 값은 후퇴 공식 fo=fs·v/(v+vs)의 결과다. 지금은 음원이 접근하는 상황이다."
+      },
+      "misconceptionTag": "doppler_sign_confusion",
+      "expectedSeconds": 75
+    },
+    {
+      "id": "L1-Q04",
+      "concept": "sound_speed_wavelength_frequency",
+      "prompt": "움직이는 음원의 앞쪽에서 더 높은 진동수가 관측되는 이유로 가장 정확한 것은?",
+      "choices": [
+        { "id": "A", "label": "음속이 더 빨라져서" },
+        { "id": "B", "label": "음속은 그대로지만 앞쪽 파장이 짧아져 f=v/λ가 커지기 때문" },
+        { "id": "C", "label": "소리 에너지가 더 커져서" },
+        { "id": "D", "label": "관찰자가 음원 쪽으로 움직여서" }
+      ],
+      "correctChoiceId": "B",
+      "correctFeedback": "맞다. 매질에 대한 음속 v는 일정하다. 음원이 움직이면 앞쪽 파면 간격(파장)이 짧아지고, f=v/λ에 의해 관측 진동수가 커진다.",
+      "incorrectFeedback": {
+        "A": "음속은 매질의 상태로 정해지며 음원의 운동과 무관하게 일정하다. 변하는 것은 파장이다.",
+        "C": "진동수 변화는 에너지 크기가 아니라 파장이 짧아지는 기하학적 효과다.",
+        "D": "이 미션의 조건은 정지한 관찰자다. 진동수 변화의 원인은 음원의 운동이 만드는 파장 변화다."
+      },
+      "misconceptionTag": "doppler_mechanism_misattribution",
+      "expectedSeconds": 75
+    }
+  ],
+  "exitCheckPrompt": "매질에 대한 음속은 그대로인데, 접근하는 음원의 관측 진동수가 높아지는 이유를 파장 변화와 연결하여 한 문장으로 쓰시오.",
+  "exitCheckQuestion": {
+    "id": "L1-EXIT",
+    "prompt": "음속이 일정한데도 접근하는 음원의 관측 진동수가 높아지는 이유로 가장 정확한 것은?",
+    "correctChoiceId": "A",
+    "choices": [
+      { "id": "A", "label": "음원 앞쪽 파장이 짧아져 f=v/λ가 커지기 때문" },
+      { "id": "B", "label": "매질에 대한 음속 자체가 빨라지기 때문" },
+      { "id": "C", "label": "소리의 에너지가 커지기 때문" }
+    ]
+  },
+  "teacherExplanationCards": [
+    { "title": "d와 a의 구분", "body": "이중 슬릿 중심 간격 d는 간섭 무늬 간격을, 단일 슬릿 폭 a는 회절 무늬 외피 폭을 결정한다. 같은 화면에서 섞어 쓰지 않는다.", "misconceptionTag": "slit_width_vs_slit_spacing_confusion" },
+    { "title": "단일 슬릿 첫 최소 조건", "body": "a sinθ=λ. a가 작아질수록 θ가 커져 중앙 무늬가 넓어진다.", "misconceptionTag": "single_slit_width_direction" },
+    { "title": "움직이는 음원 도플러 식의 조건과 부호", "body": "정지 매질·정지 관찰자·움직이는 음원 조건에서 접근 fo=fs·v/(v−vs), 후퇴 fo=fs·v/(v+vs). 음속 v는 음원의 운동과 무관하다.", "misconceptionTag": "doppler_sign_confusion" },
+    { "title": "'상대 속도 하나'로 처리하면 안 되는 이유", "body": "음원과 관찰자의 운동은 음속 v(매질 기준)에 대해 비대칭적으로 작용한다. 상대 속도 한 값으로 단순화하면 접근·후퇴 계산이 틀릴 수 있다.", "misconceptionTag": "doppler_mechanism_misattribution" }
+  ]
+}

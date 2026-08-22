@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.1",
+  "version": "project-echo-3-lessons-2026-08-22",
+  "compiler": "mind-ar@1.2.5 OfflineCompiler",
+  "target_count": 3,
+  "targets_file": "../assets/markers/targets.mind",
+  "targets_bytes": 2489429,
+  "markers": [
+    {
+      "targetIndex": 0,
+      "file": "../assets/markers/M01_파동의_흔적.png",
+      "lesson": 1,
+      "title": "파동의 흔적",
+      "review": [
+        "노이즈 캔슬링",
+        "영의 이중 슬릿"
+      ],
+      "main": [
+        "단일 슬릿 회절",
+        "움직이는 음원의 도플러 효과"
+      ],
+      "width": 1254,
+      "height": 1254,
+      "sha256": "e0ae8e7ac80eba2e379e6077cd3384165bdcea76b631012099e203aea3c27b07"
+    },
+    {
+      "targetIndex": 1,
+      "file": "../assets/markers/M02_전자기파의_선택.png",
+      "lesson": 2,
+      "title": "전자기파의 선택",
+      "review": [
+        "전파와 가시광선은 모두 전자기파"
+      ],
+      "main": [
+        "레이더 거리",
+        "레이더 방사 속도",
+        "야기 안테나",
+        "LC 공명"
+      ],
+      "width": 1254,
+      "height": 1254,
+      "sha256": "7d3c5af5f288cddcb33f8dbb14e75830e31610ebd361e11460025a00502e0f4e"
+    },
+    {
+      "targetIndex": 2,
+      "file": "../assets/markers/M03_양자의_증거.png",
+      "lesson": 3,
+      "title": "양자의 증거",
+      "review": [
+        "빛의 이중성",
+        "물질의 이중성"
+      ],
+      "main": [
+        "광전 효과",
+        "전자 회절 증거",
+        "불확정성",
+        "확률적 원자 모형"
+      ],
+      "width": 1254,
+      "height": 1254,
+      "sha256": "a1b758777cf3e8949d149cfed81fd2e717834f048124264ef2ddafdd5b5b8c97"
+    }
+  ]
+}

@@ -1,0 +1,336 @@
+{
+  "schema_version": "1.0",
+  "content_version": "project-echo-prd-v1-2026-08-22",
+  "product": {
+    "title": "PROJECT ECHO: 흔적 기록소",
+    "subject": "고등학교 물리학 II",
+    "lesson_count": 3,
+    "usable_minutes_per_lesson": 45,
+    "game_minutes_per_lesson": 20,
+    "required_questions_per_lesson": 4,
+    "required_question_total": 12
+  },
+  "timeline_minutes": {
+    "entry": 3,
+    "prior_recall": 5,
+    "game": 20,
+    "teacher_explanation": 13,
+    "exit_check": 3,
+    "save_buffer": 1
+  },
+  "prior_learning": [
+    "노이즈 캔슬링",
+    "영의 이중 슬릿",
+    "전파와 가시광선은 모두 전자기파",
+    "빛의 이중성",
+    "물질의 이중성"
+  ],
+  "excluded_from_main_game": [
+    "렌즈 상 작도",
+    "교류 발생 역사 서사"
+  ],
+  "science_invariants": [
+    {
+      "id": "SCI-NC-01",
+      "rule": "노이즈 캔슬링은 특정 위치와 주파수 범위에서 압력 진폭을 줄이는 간섭으로 표현하며 에너지가 사라진다고 하지 않는다."
+    },
+    {
+      "id": "SCI-WAVE-01",
+      "rule": "이중 슬릿 중심 간격 d와 단일 슬릿 폭 a를 같은 변수로 취급하지 않는다."
+    },
+    {
+      "id": "SCI-WAVE-02",
+      "rule": "1차시 도플러 정량 활동은 정지 매질, 정지 관찰자, 움직이는 음원 조건을 사용하며 매질에 대한 음속은 일정하다."
+    },
+    {
+      "id": "SCI-RADAR-01",
+      "rule": "레이더 거리는 왕복 시간 R=cΔt/2, 운동은 도플러 변화와 방사 속도로 구분한다."
+    },
+    {
+      "id": "SCI-ANT-01",
+      "rule": "야기 안테나는 주엽 방향의 이득과 감도가 크지만 다른 방향 응답이 0이라고 표현하지 않는다."
+    },
+    {
+      "id": "SCI-LC-01",
+      "rule": "이상적 LC 공명은 f0=1/(2π√LC)이며 실제 선택 곡선은 유한 대역폭을 가진다."
+    },
+    {
+      "id": "SCI-EM-01",
+      "rule": "전파와 가시광선은 모두 전자기파이며 진공에서 같은 속력 c로 전파한다."
+    },
+    {
+      "id": "SCI-PE-01",
+      "rule": "문턱 진동수 아래에서는 세기를 높여도 광전자가 방출되지 않는다."
+    },
+    {
+      "id": "SCI-PE-02",
+      "rule": "문턱 위에서 세기는 주로 광전류에, 진동수는 최대 운동 에너지와 정지 전압에 영향을 준다."
+    },
+    {
+      "id": "SCI-DUAL-01",
+      "rule": "전자 한 개의 검출은 국소적 점이고 누적 분포가 간섭 또는 회절 무늬를 보이며 전자가 물리적으로 갈라진다고 표현하지 않는다."
+    },
+    {
+      "id": "SCI-UNC-01",
+      "rule": "Δx와 Δp는 반복 측정 분포의 표준편차이며 ΔxΔp≥ℏ/2이다."
+    },
+    {
+      "id": "SCI-ATOM-01",
+      "rule": "전자구름은 실제 안개나 고전 궤도가 아니라 |ψ|² 위치 확률 밀도의 정성적 표현이다."
+    }
+  ],
+  "lessons": [
+    {
+      "id": 1,
+      "marker_target_index": 0,
+      "title": "파동의 흔적",
+      "review": [
+        "노이즈 캔슬링",
+        "영의 이중 슬릿"
+      ],
+      "missions": [
+        {
+          "id": "L1-M1",
+          "title": "단일 슬릿 회절",
+          "primary_control": "slit_width_a",
+          "fixed_variables": [
+            "wavelength_lambda",
+            "screen_distance_D"
+          ],
+          "model": "a sin(theta_min)=lambda",
+          "estimated_seconds": 210
+        },
+        {
+          "id": "L1-M2",
+          "title": "움직이는 음원의 도플러 효과",
+          "primary_control": "source_speed_vs",
+          "fixed_variables": [
+            "source_frequency_fs",
+            "sound_speed_v",
+            "observer_speed_zero"
+          ],
+          "model": "fo=fs*v/(v∓vs)",
+          "estimated_seconds": 210
+        }
+      ],
+      "questions": [
+        {
+          "id": "L1-Q01",
+          "type": "classification",
+          "concept": "slit_variables",
+          "expected_seconds": 60
+        },
+        {
+          "id": "L1-Q02",
+          "type": "direction",
+          "concept": "single_slit_width",
+          "expected_seconds": 45
+        },
+        {
+          "id": "L1-Q03",
+          "type": "numeric",
+          "concept": "moving_source_doppler",
+          "expected_seconds": 75
+        },
+        {
+          "id": "L1-Q04",
+          "type": "explanation",
+          "concept": "sound_speed_wavelength_frequency",
+          "expected_seconds": 75
+        }
+      ],
+      "teacher_explanation_focus": [
+        "d와 a의 구분",
+        "단일 슬릿 첫 최소 조건",
+        "움직이는 음원 도플러 식의 조건과 부호"
+      ]
+    },
+    {
+      "id": 2,
+      "marker_target_index": 1,
+      "title": "전자기파의 선택",
+      "review": [
+        "전파와 가시광선은 모두 전자기파"
+      ],
+      "missions": [
+        {
+          "id": "L2-M1",
+          "title": "레이더 거리",
+          "primary_control": "round_trip_time",
+          "fixed_variables": [
+            "wave_speed_c"
+          ],
+          "model": "R=c*delta_t/2",
+          "estimated_seconds": 180
+        },
+        {
+          "id": "L2-M2",
+          "title": "레이더 방사 속도",
+          "primary_control": "target_radial_motion",
+          "fixed_variables": [
+            "radar_wavelength"
+          ],
+          "model": "abs(delta_f)=2*abs(v_r)/lambda",
+          "estimated_seconds": 180
+        },
+        {
+          "id": "L2-M3",
+          "title": "야기 안테나와 LC 수신국",
+          "primary_control": "two_sequential_single_controls",
+          "fixed_variables": [
+            "nonzero_back_response",
+            "inductance_L"
+          ],
+          "model": "f0=1/(2*pi*sqrt(L*C))",
+          "estimated_seconds": 270
+        }
+      ],
+      "questions": [
+        {
+          "id": "L2-Q01",
+          "type": "numeric",
+          "concept": "radar_range",
+          "expected_seconds": 75
+        },
+        {
+          "id": "L2-Q02",
+          "type": "classification",
+          "concept": "range_vs_velocity",
+          "expected_seconds": 60
+        },
+        {
+          "id": "L2-Q03",
+          "type": "concept",
+          "concept": "yagi_directivity",
+          "expected_seconds": 45
+        },
+        {
+          "id": "L2-Q04",
+          "type": "direction",
+          "concept": "lc_resonance",
+          "expected_seconds": 60
+        }
+      ],
+      "teacher_explanation_focus": [
+        "전자기파 공통성과 검출 차이",
+        "왕복 시간과 방사 속도 구분",
+        "야기 주엽과 전후비",
+        "LC 공명과 유한 대역폭"
+      ]
+    },
+    {
+      "id": 3,
+      "marker_target_index": 2,
+      "title": "양자의 증거",
+      "review": [
+        "빛의 이중성",
+        "물질의 이중성"
+      ],
+      "missions": [
+        {
+          "id": "L3-M1",
+          "title": "광전 효과",
+          "primary_control": "frequency_then_intensity_on_separate_screens",
+          "fixed_variables": [
+            "work_function_phi"
+          ],
+          "model": "Kmax=max(0,hf-phi)",
+          "estimated_seconds": 270
+        },
+        {
+          "id": "L3-M2",
+          "title": "전자 검출 누적",
+          "primary_control": "accumulation_count",
+          "fixed_variables": [
+            "slit_geometry",
+            "electron_energy"
+          ],
+          "model": "localized_detections_approach_interference_distribution",
+          "estimated_seconds": 180
+        },
+        {
+          "id": "L3-M3",
+          "title": "위치와 운동량 분포",
+          "primary_control": "position_standard_deviation_delta_x",
+          "fixed_variables": [
+            "minimum_uncertainty_gaussian_model"
+          ],
+          "model": "delta_p=hbar/(2*delta_x)",
+          "estimated_seconds": 180
+        },
+        {
+          "id": "L3-BOSS",
+          "title": "확률적 원자 모형",
+          "primary_control": "evidence_mapping",
+          "fixed_variables": [
+            "qualitative_visualization"
+          ],
+          "model": "probability_density=abs(psi)^2",
+          "estimated_seconds": 120
+        }
+      ],
+      "questions": [
+        {
+          "id": "L3-Q01",
+          "type": "classification",
+          "concept": "photoelectric_frequency_intensity",
+          "expected_seconds": 75
+        },
+        {
+          "id": "L3-Q02",
+          "type": "evidence",
+          "concept": "localized_detection_accumulation",
+          "expected_seconds": 60
+        },
+        {
+          "id": "L3-Q03",
+          "type": "direction",
+          "concept": "uncertainty_spreads",
+          "expected_seconds": 45
+        },
+        {
+          "id": "L3-Q04",
+          "type": "explanation",
+          "concept": "probability_cloud",
+          "expected_seconds": 60
+        }
+      ],
+      "teacher_explanation_focus": [
+        "광전 효과에서 진동수와 세기",
+        "단일 전자 검출과 누적 분포",
+        "표준편차로서의 Δx와 Δp",
+        "|ψ|² 확률 밀도"
+      ]
+    }
+  ],
+  "privacy": {
+    "allowed_local": [
+      "anonymous_session_id",
+      "lesson",
+      "progress",
+      "attempt_count",
+      "score",
+      "mode",
+      "technical_events"
+    ],
+    "forbidden": [
+      "real_name",
+      "student_number",
+      "email",
+      "location",
+      "photo",
+      "video",
+      "camera_frame",
+      "microphone_audio"
+    ],
+    "external_services_default": "disabled"
+  },
+  "release_blockers": [
+    "science_error",
+    "privacy_leak",
+    "ar_without_equivalent_fallback",
+    "required_path_over_20_minutes",
+    "stale_content_cache_mix",
+    "claiming_device_validation_without_real_device_records"
+  ]
+}

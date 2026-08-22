@@ -1,0 +1,224 @@
+{
+  "lessonId": 3,
+  "contentVersion": "project-echo-prd-v1-2026-08-22",
+  "markerVersion": "project-echo-3-lessons-2026-08-22",
+  "storyIntro": "마지막 기록은 고전적 입자·파동 그림만으로 설명되지 않는다. M03을 스캔해 서로 다른 세 증거를 확률적 원자 모형으로 연결하라.",
+  "recallPrompts": [
+    {
+      "id": "L3-R01",
+      "prompt": "빛과 물질의 이중성에 대한 설명으로 가장 정확한 것은?",
+      "correctChoiceId": "A",
+      "choices": [
+        { "id": "A", "label": "빛은 간섭·회절과 광자적 상호작용을 모두 보이고, 물질도 λ=h/p의 드브로이 파장으로 파동성을 나타낼 수 있다" },
+        { "id": "B", "label": "빛은 파동성만, 물질은 입자성만 가진다" },
+        { "id": "C", "label": "이중성은 빛에만 해당하고 전자 같은 물질에는 적용되지 않는다" },
+        { "id": "D", "label": "물질의 파동성은 매우 무거운 물체에서만 나타난다" }
+      ]
+    }
+  ],
+  "missions": [
+    {
+      "id": "L3-M1",
+      "title": "광전 효과 문턱과 에너지 — 진동수",
+      "arObservationText": "빛을 비추면 금속 표면에서 전자가 방출되는 모습을 관찰한다.",
+      "predictionPrompt": "문턱 진동수보다 낮은 빛의 세기를 아무리 높여도 전자가 방출될까?",
+      "predictionChoices": [
+        { "id": "A", "label": "방출되지 않는다" },
+        { "id": "B", "label": "세기를 충분히 높이면 방출된다" }
+      ],
+      "correctPredictionChoiceId": "A",
+      "controlLabel": "빛의 진동수 f (세기 고정)",
+      "controlMin": 4.0,
+      "controlMax": 9.0,
+      "controlStep": 0.1,
+      "controlDefault": 5.5,
+      "controlUnit": "×10^14 Hz",
+      "verificationCaption": "Kmax = hf − φ (문턱 아래에서는 방출 없음). 세기가 아니라 진동수가 문턱과 Kmax를 결정한다.",
+      "estimatedSeconds": 150
+    },
+    {
+      "id": "L3-M1b",
+      "title": "광전 효과 — 세기",
+      "arObservationText": "문턱 위 진동수를 고정하고 빛의 세기만 바꾼다.",
+      "predictionPrompt": "문턱 위에서 빛의 세기를 높이면 개별 전자의 최대 운동 에너지는 어떻게 될까?",
+      "predictionChoices": [
+        { "id": "A", "label": "변하지 않는다(광전류만 증가)" },
+        { "id": "B", "label": "세기에 비례해 커진다" }
+      ],
+      "correctPredictionChoiceId": "A",
+      "controlLabel": "빛의 세기 (진동수 고정, 문턱 위)",
+      "controlMin": 1,
+      "controlMax": 10,
+      "controlStep": 1,
+      "controlDefault": 3,
+      "controlUnit": "상대 단위",
+      "verificationCaption": "이상적 경향: 세기는 주로 단위 시간당 방출 전자 수(광전류)에 영향을 준다. 정지 전압과 Kmax는 진동수로 결정된다. 모든 광자가 반드시 전자를 방출한다고 단정하지 않는다.",
+      "estimatedSeconds": 120
+    },
+    {
+      "id": "L3-M2",
+      "title": "한 점씩 쌓이는 전자 증거",
+      "arObservationText": "전자가 한 번에 하나씩 검출 스크린에 점으로 나타나는 모습을 관찰한다.",
+      "predictionPrompt": "전자를 하나씩 계속 쏘아 점이 많이 쌓이면 전체 분포는 어떤 모양이 될까?",
+      "predictionChoices": [
+        { "id": "A", "label": "간섭·회절 무늬와 비슷한 분포로 접근한다" },
+        { "id": "B", "label": "무작위로 흩어진 채 무늬가 나타나지 않는다" }
+      ],
+      "correctPredictionChoiceId": "A",
+      "controlLabel": "누적 검출 수",
+      "controlMin": 0,
+      "controlMax": 3,
+      "controlStep": 1,
+      "controlDefault": 0,
+      "controlUnit": "단계",
+      "discreteValues": [1, 20, 200, 2000],
+      "verificationCaption": "각 검출은 화면의 한 점(국소적)이다. 누적된 점들이 간섭·회절 무늬에 접근한다. 전자가 두 조각으로 갈라지는 장면은 없다.",
+      "estimatedSeconds": 180
+    },
+    {
+      "id": "L3-M3",
+      "title": "국소화와 운동량 분포",
+      "arObservationText": "위치가 좁게 국소화된 파동 묶음과 넓게 퍼진 파동 묶음을 비교 관찰한다.",
+      "predictionPrompt": "위치 분포 폭 Δx를 더 좁게 만들면(더 국소화하면) 운동량 분포 폭 Δp는 어떻게 될까?",
+      "predictionChoices": [
+        { "id": "A", "label": "커진다" },
+        { "id": "B", "label": "작아진다" },
+        { "id": "C", "label": "변화가 없다" }
+      ],
+      "correctPredictionChoiceId": "A",
+      "controlLabel": "위치 분포 폭 Δx",
+      "controlMin": 0.5,
+      "controlMax": 3,
+      "controlStep": 0.1,
+      "controlDefault": 1.5,
+      "controlUnit": "Å",
+      "verificationCaption": "최소 불확정 모형: Δp=ħ/(2Δx). Δx, Δp는 반복 측정 분포의 표준편차이며 계기 오차가 아니다. 일반 상태는 ΔxΔp≥ħ/2로 곱이 더 클 수 있다.",
+      "estimatedSeconds": 180
+    },
+    {
+      "id": "L3-BOSS",
+      "title": "확률적 원자 모형 기록 복원",
+      "kind": "boss",
+      "arObservationText": "세 증거(광전 효과, 누적 분포, 불확정성)를 확률적 원자 모형에 연결한다.",
+      "predictionPrompt": "",
+      "predictionChoices": [],
+      "correctPredictionChoiceId": "A",
+      "controlLabel": "",
+      "controlMin": 0,
+      "controlMax": 0,
+      "controlStep": 1,
+      "controlDefault": 0,
+      "controlUnit": "",
+      "verificationCaption": "",
+      "bossNarrative": "전자 위치를 고전 궤도로 확정하지 않고, 파동 함수에서 얻는 |ψ|²를 위치 확률 밀도로 해석한다. 화면의 전자구름은 실제 안개가 아니라 확률 분포의 정성적 시각화다.",
+      "estimatedSeconds": 120
+    }
+  ],
+  "bossCheck": {
+    "id": "L3-BOSS-CHECK",
+    "prompt": "전자구름이 진하게 표시된 위치에 대한 설명으로 가장 정확한 것은?",
+    "correctChoiceId": "A",
+    "choices": [
+      { "id": "A", "label": "그 위치에서 전자가 발견될 확률 밀도(|ψ|²)가 높다는 뜻이다" },
+      { "id": "B", "label": "전자가 실제로 안개처럼 그 공간에 퍼져서 존재한다는 뜻이다" },
+      { "id": "C", "label": "전자가 그 위치를 고전적인 궤도로 돌고 있다는 뜻이다" }
+    ]
+  },
+  "questions": [
+    {
+      "id": "L3-Q01",
+      "concept": "photoelectric_frequency_intensity",
+      "prompt": "광전 효과에서 진동수와 세기가 각각 미치는 영향으로 가장 정확한 것은?",
+      "choices": [
+        { "id": "A", "label": "진동수는 문턱·최대 운동 에너지에, 세기는 주로 광전류(방출 전자 수)에 영향을 준다" },
+        { "id": "B", "label": "세기를 높이면 문턱 아래에서도 전자가 방출된다" },
+        { "id": "C", "label": "세기가 개별 전자의 최대 운동 에너지를 결정한다" },
+        { "id": "D", "label": "진동수는 광전류에만 영향을 주고 에너지와는 무관하다" }
+      ],
+      "correctChoiceId": "A",
+      "correctFeedback": "맞다. hf=φ+Kmax에서 진동수 f는 문턱과 Kmax를, 세기는 주로 단위 시간당 방출 전자 수(광전류)를 결정한다.",
+      "incorrectFeedback": {
+        "B": "문턱 진동수 아래에서는 세기를 아무리 높여도 광전자가 방출되지 않는다.",
+        "C": "개별 전자의 최대 운동 에너지는 세기가 아니라 진동수(hf−φ)로 결정된다.",
+        "D": "진동수는 문턱 조건과 최대 운동 에너지에 직접 연결된다."
+      },
+      "misconceptionTag": "photoelectric_intensity_energy_confusion",
+      "expectedSeconds": 75
+    },
+    {
+      "id": "L3-Q02",
+      "concept": "localized_detection_accumulation",
+      "prompt": "전자를 한 번에 하나씩 검출했을 때와 그것이 많이 누적됐을 때의 의미로 가장 정확한 것은?",
+      "choices": [
+        { "id": "A", "label": "개별 검출은 국소적인 점이고, 누적되면 파동적인 간섭·회절 분포가 나타난다" },
+        { "id": "B", "label": "전자 하나하나가 물리적으로 둘로 갈라져서 무늬를 만든다" },
+        { "id": "C", "label": "누적해도 무작위 분포일 뿐 특별한 무늬는 나타나지 않는다" },
+        { "id": "D", "label": "개별 검출도 이미 무늬 모양으로 나타난다" }
+      ],
+      "correctChoiceId": "A",
+      "correctFeedback": "맞다. 각 검출은 국소적인 점이며, 많은 전자의 누적된 통계적 분포가 간섭·회절 무늬로 나타난다.",
+      "incorrectFeedback": {
+        "B": "전자가 물리적으로 둘로 갈라지는 것이 아니다. 각 검출은 하나의 국소적인 점이다.",
+        "C": "충분히 누적되면 간섭·회절과 같은 파동적 분포 패턴이 나타난다.",
+        "D": "개별 검출 하나는 무늬를 이루지 못한다. 무늬는 많은 검출이 누적되어야 드러난다."
+      },
+      "misconceptionTag": "electron_splitting_misconception",
+      "expectedSeconds": 60
+    },
+    {
+      "id": "L3-Q03",
+      "concept": "uncertainty_spreads",
+      "prompt": "위치 분포 폭 Δx를 줄이면(더 국소화하면) 최소 운동량 분포 폭 Δp는 어떻게 되는가?",
+      "choices": [
+        { "id": "A", "label": "증가한다" },
+        { "id": "B", "label": "감소한다" },
+        { "id": "C", "label": "변화가 없다" }
+      ],
+      "correctChoiceId": "A",
+      "correctFeedback": "맞다. Δp=ħ/(2Δx) 최소 불확정 모형에서 Δx가 작아지면 Δp는 커진다.",
+      "incorrectFeedback": {
+        "B": "Δp=ħ/(2Δx)에서 Δx가 작아지면 분모가 작아져 Δp는 오히려 커진다.",
+        "C": "Δx와 Δp는 반비례 관계에 있으므로 Δx를 바꾸면 Δp도 반드시 변한다."
+      },
+      "misconceptionTag": "uncertainty_as_instrument_error",
+      "expectedSeconds": 45
+    },
+    {
+      "id": "L3-Q04",
+      "concept": "probability_cloud",
+      "prompt": "현대 원자 모형에서 전자구름의 짙고 옅음이 뜻하는 것은?",
+      "choices": [
+        { "id": "A", "label": "|ψ|²에 비례하는 위치 확률 밀도의 정성적 표현" },
+        { "id": "B", "label": "전자가 실제로 안개처럼 그 물질로 퍼져 있음" },
+        { "id": "C", "label": "전자가 도는 고전적 궤도의 궤적" },
+        { "id": "D", "label": "전자의 실제 크기와 모양" }
+      ],
+      "correctChoiceId": "A",
+      "correctFeedback": "맞다. 전자구름의 농도는 파동 함수로부터 얻는 |ψ|², 즉 위치 확률 밀도를 정성적으로 시각화한 것이다.",
+      "incorrectFeedback": {
+        "B": "전자가 그 구름 물질로 실제로 퍼져 있는 것이 아니라, 발견될 확률이 그렇게 분포한다는 뜻이다.",
+        "C": "현대 원자 모형은 전자를 고전적인 궤도로 그리지 않는다. 확률 밀도로 표현한다.",
+        "D": "구름의 진하기는 전자의 크기가 아니라 위치를 발견할 확률의 크기를 나타낸다."
+      },
+      "misconceptionTag": "electron_cloud_as_literal_fog",
+      "expectedSeconds": 60
+    }
+  ],
+  "exitCheckPrompt": "'전자구름은 전자가 실제 안개처럼 퍼진 모습이 아니라 ________을 나타낸다'를 완성하고, Δx와 Δp의 의미를 한 문장으로 설명하시오.",
+  "exitCheckQuestion": {
+    "id": "L3-EXIT",
+    "prompt": "'전자구름은 전자가 실제 안개처럼 퍼진 모습이 아니라 ________을 나타낸다'의 빈칸으로 가장 적절한 것은?",
+    "correctChoiceId": "A",
+    "choices": [
+      { "id": "A", "label": "위치 확률 밀도(|ψ|²)" },
+      { "id": "B", "label": "전자의 실제 부피" },
+      { "id": "C", "label": "측정 장비의 오차 범위" }
+    ]
+  },
+  "teacherExplanationCards": [
+    { "title": "hf=φ+Kmax, 문턱 진동수, 세기와 광전류", "body": "진동수는 문턱과 최대 운동 에너지를, 세기는 주로 광전류(방출 전자 수)를 결정한다.", "misconceptionTag": "photoelectric_intensity_energy_confusion" },
+    { "title": "단일 전자 검출의 누적과 드브로이 관계", "body": "각 검출은 국소적인 점이며, 많은 전자의 누적이 간섭·회절 분포를 만든다. 전자가 갈라지지 않는다.", "misconceptionTag": "electron_splitting_misconception" },
+    { "title": "ΔxΔp≥ħ/2, 표준편차와 측정 오차 구분", "body": "Δx, Δp는 반복 측정 분포의 표준편차이며 계기의 정밀도 부족이 아니라 양자 상태의 본질적 퍼짐이다.", "misconceptionTag": "uncertainty_as_instrument_error" },
+    { "title": "|ψ|² 확률 밀도와 고전 궤도 모형의 차이", "body": "전자구름은 |ψ|²로 정의되는 위치 확률 밀도의 정성적 표현이며, 실제 안개나 고전 궤도가 아니다.", "misconceptionTag": "electron_cloud_as_literal_fog" }
+  ]
+}
