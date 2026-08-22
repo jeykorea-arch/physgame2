@@ -1,7 +1,18 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+beforeEach(() => {
+  vi.stubEnv("VITE_ENABLE_REALTIME_TEACHER_BOARD", "false");
+  vi.stubEnv("VITE_FIREBASE_API_KEY", "");
+  vi.stubEnv("VITE_FIREBASE_AUTH_DOMAIN", "");
+  vi.stubEnv("VITE_FIREBASE_DATABASE_URL", "");
+  vi.stubEnv("VITE_FIREBASE_PROJECT_ID", "");
+  vi.stubEnv("VITE_FIREBASE_APP_ID", "");
+  vi.resetModules();
+});
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
   vi.resetModules();
 });
 
