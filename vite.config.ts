@@ -1,12 +1,17 @@
 import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { resolveDataSource } from "./scripts/lib/resolve-content-source.ts";
 
-// 콘텐츠 버전은 physgame2/data/content_contract.json을 유일한 원본으로 삼는다(.env 등에 따로
-// 적어두지 않는다). CI 빌드에는 로컬 .env가 없으므로, 수동으로 맞춰야 하는 값을 없애 "unknown"으로
-// 새는 경로를 원천적으로 막는다.
-const contentContract = JSON.parse(readFileSync(new URL("../data/content_contract.json", import.meta.url), "utf-8"));
+// 콘텐츠 버전은 content_contract.json을 유일한 원본으로 삼는다(.env 등에 따로 적어두지 않는다).
+// physgame2/data/(PRD 원본)가 있으면 그것을, 배포 저장소처럼 web-app만 있으면 이미 커밋된
+// public/data/의 사본을 원본으로 쓴다(resolveDataSource 참고). "unknown"으로 새는 경로를 막는다.
+const webAppRoot = path.dirname(fileURLToPath(import.meta.url));
+const { contentContractPath } = resolveDataSource(webAppRoot);
+const contentContract = JSON.parse(readFileSync(contentContractPath, "utf-8"));
 
 // 하위 경로 배포(GitHub Pages 등)에서도 자산 경로가 깨지지 않도록 상대 base를 사용한다.
 // 실제 배포 경로는 빌드 시 VITE_BASE_PATH 환경변수로 덮어쓸 수 있다.

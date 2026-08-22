@@ -17,5 +17,5 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["vite/client", "vitest/globals", "vite-plugin-pwa/client"]
   },
-  "include": ["src", "tests", "scripts", "vite.config.ts", "vite.mobile.config.ts"]
+  "include": ["src", "tests", "scripts", "scripts/lib", "vite.config.ts", "vite.mobile.config.ts"]
 }

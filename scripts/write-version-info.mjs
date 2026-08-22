@@ -4,23 +4,25 @@ import { readFile, writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { resolveDataSource } from "./lib/resolve-content-source.ts";
 
 const webAppRoot = path.dirname(fileURLToPath(import.meta.url)).replace(/scripts$/, "");
-const projectRoot = path.resolve(webAppRoot, "..");
 
 function tryGitCommit() {
   try {
-    return execSync("git rev-parse --short HEAD", { cwd: projectRoot, stdio: ["ignore", "pipe", "ignore"] })
+    // git 저장소 루트는 physgame2/web-app/ 자체다(physgame2/ 전체가 아니다).
+    return execSync("git rev-parse --short HEAD", { cwd: webAppRoot, stdio: ["ignore", "pipe", "ignore"] })
       .toString()
       .trim();
   } catch {
-    return null; // git 저장소가 아직 없으면 null. 별도 승인 없이 git init을 실행하지 않는다.
+    return null; // git 저장소가 아직 없으면 null.
   }
 }
 
 async function main() {
-  const contract = JSON.parse(await readFile(path.join(projectRoot, "data", "content_contract.json"), "utf-8"));
-  const manifest = JSON.parse(await readFile(path.join(projectRoot, "data", "marker_manifest.json"), "utf-8"));
+  const { contentContractPath, markerManifestPath } = resolveDataSource(webAppRoot);
+  const contract = JSON.parse(await readFile(contentContractPath, "utf-8"));
+  const manifest = JSON.parse(await readFile(markerManifestPath, "utf-8"));
   const pkg = JSON.parse(await readFile(path.join(webAppRoot, "package.json"), "utf-8"));
 
   const versionInfo = {
