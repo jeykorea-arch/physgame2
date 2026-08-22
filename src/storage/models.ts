@@ -20,6 +20,7 @@ export interface ProgressRecord {
   lessonId: 1 | 2 | 3;
   mode: LessonMode;
   phase: LessonPhase;
+  gameStage?: "observe" | "missions" | "questions";
   missionId: string | null;
   questionId: string | null;
   completedMissionIds: string[];

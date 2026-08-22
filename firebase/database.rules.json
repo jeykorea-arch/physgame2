@@ -2,7 +2,7 @@
   "rules": {
     ".read": false,
     ".write": false,
-    "classes": {
+    "projectEchoClasses": {
       "$classCode": {
         ".write": "auth != null && ((!data.exists() && newData.child('ownerUid').val() === auth.uid) || data.child('ownerUid').val() === auth.uid)",
         "ownerUid": {
@@ -13,11 +13,20 @@
           ".validate": "newData.hasChildren(['lessonId','active','createdAt']) && newData.child('lessonId').isNumber() && newData.child('lessonId').val() >= 1 && newData.child('lessonId').val() <= 3 && newData.child('active').isBoolean() && newData.child('createdAt').isNumber()"
         },
         "students": {
-          ".read": "auth != null && root.child('classes').child($classCode).child('ownerUid').val() === auth.uid",
+          ".read": "auth != null && root.child('projectEchoClasses').child($classCode).child('ownerUid').val() === auth.uid",
           "$uid": {
             ".read": "auth != null && auth.uid === $uid",
-            ".write": "auth != null && auth.uid === $uid && (root.child('classes').child($classCode).child('public').child('active').val() === true || newData.child('connected').val() === false)",
-            ".validate": "newData.hasChildren(['alias','connected','lessonId','phase','mode','completedQuestionCount','score','lastSeenAt']) && newData.child('alias').isString() && newData.child('alias').val().length >= 2 && newData.child('alias').val().length <= 12 && newData.child('connected').isBoolean() && newData.child('lessonId').isNumber() && newData.child('lessonId').val() >= 1 && newData.child('lessonId').val() <= 3 && newData.child('phase').isString() && newData.child('phase').val().length <= 24 && newData.child('mode').isString() && (newData.child('mode').val() === 'ar' || newData.child('mode').val() === 'non-ar') && newData.child('completedQuestionCount').isNumber() && newData.child('completedQuestionCount').val() >= 0 && newData.child('completedQuestionCount').val() <= 4 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 40 && newData.child('lastSeenAt').isNumber()",
+            ".write": "auth != null && auth.uid === $uid && (root.child('projectEchoClasses').child($classCode).child('public').child('active').val() === true || newData.child('connected').val() === false)",
+            ".validate": "newData.hasChildren(['alias','connected','lessonId','phase','mode','completedQuestionCount','score','lastSeenAt']) && newData.child('alias').isString() && newData.child('alias').val().length >= 2 && newData.child('alias').val().length <= 12 && newData.child('connected').isBoolean() && newData.child('lessonId').isNumber() && newData.child('lessonId').val() === root.child('projectEchoClasses').child($classCode).child('public').child('lessonId').val() && newData.child('phase').isString() && newData.child('phase').val().length <= 24 && newData.child('mode').isString() && (newData.child('mode').val() === 'ar' || newData.child('mode').val() === 'non-ar') && newData.child('completedQuestionCount').isNumber() && newData.child('completedQuestionCount').val() >= 0 && newData.child('completedQuestionCount').val() <= 4 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 40 && newData.child('lastSeenAt').isNumber()",
+            "gameStage": {
+              ".validate": "newData.isString() && (newData.val() === 'observe' || newData.val() === 'missions' || newData.val() === 'questions')"
+            },
+            "completedMissionCount": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5"
+            },
+            "currentMissionId": {
+              ".validate": "newData.isString() && newData.val().length <= 16"
+            },
             "answers": {
               ".validate": "newData.numChildren() <= 4",
               "$questionId": {

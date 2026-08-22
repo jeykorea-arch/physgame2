@@ -1,0 +1,31 @@
+PROJECT ECHO v0.3.0 실행 안내
+================================
+
+1. PC에서 실행
+   - 압축을 완전히 풉니다.
+   - PROJECT_ECHO_실행.cmd를 더블클릭합니다.
+   - 브라우저가 자동으로 열립니다.
+   - 종료할 때는 검은 실행 창에서 Ctrl+C를 누릅니다.
+   - Node.js가 없는 PC에서는 https://nodejs.org/ 의 LTS 버전을 먼저 설치합니다.
+
+   학교에서 가장 간단히 실행하려면 PROJECT_ECHO_학교실행.html을 더블클릭합니다.
+   이 파일은 Node.js 없이 공개 HTTPS 교사용 화면을 엽니다. 학교 인터넷 연결이 필요합니다.
+
+2. 스마트폰 AR 수업에서 실행
+   - 카메라 사용을 위해 HTTPS 주소가 필요합니다.
+   - dist 폴더의 내용 전체를 GitHub Pages, Firebase Hosting 등 HTTPS 정적 호스팅에 배포합니다.
+   - 학생 스마트폰에서 해당 HTTPS 주소를 열고 카메라 권한을 허용합니다.
+
+3. 차시별 QR·실시간 진행판 설정
+   - 교사용 화면에서 차시를 선택하면 학생 접속 QR이 즉시 표시됩니다.
+   - 학생이 QR을 찍으면 선택한 차시 게임 입구로 바로 들어갑니다.
+   - Firebase 프로젝트에서 익명 인증과 Realtime Database를 준비합니다.
+   - firebase/database.rules.json의 규칙을 Firebase에 게시합니다.
+   - dist/firebase-config.json에서 enabled를 true로 바꾸고 웹 설정값 5개를 채웁니다.
+   - 접속 인원과 진행 상황까지 확인하려면 '실시간 수업 열기'를 누릅니다.
+   - 자세한 내용은 firebase/README.md를 확인합니다.
+
+4. 주의
+   - file:// 방식으로 index.html을 직접 열면 모듈과 카메라가 정상 동작하지 않습니다.
+   - 이 패키지는 로컬 수정본이며 공개 사이트에는 아직 반영되지 않았습니다.
+   - 실제 수업 전 Android/iPhone에서 카메라 권한, 마커 인식, 저조도 환경을 확인해 주세요.

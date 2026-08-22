@@ -33,6 +33,7 @@ interface UseArControllerOptions {
 }
 
 interface MindArAnchor {
+  group: import("three").Group;
   onTargetFound: (() => void) | null;
   onTargetLost: (() => void) | null;
 }
@@ -50,6 +51,7 @@ interface MindArThreeInstance {
 export function useArController({ targetIndex, targetsMindUrl, onTechEvent }: UseArControllerOptions) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mindArRef = useRef<MindArThreeInstance | null>(null);
+  const lessonSceneRef = useRef<import("./ar-scenes").LessonArScene | null>(null);
   const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [state, setState] = useState<ArState>("idle");
@@ -61,6 +63,18 @@ export function useArController({ targetIndex, targetsMindUrl, onTechEvent }: Us
     fallbackTimerRef.current = null;
   }, []);
 
+  const startSearchTimers = useCallback(() => {
+    clearTimers();
+    slowTimerRef.current = setTimeout(() => {
+      onTechEvent("markerNotFound10s");
+      setState("slow-search");
+    }, SLOW_SEARCH_MS);
+    fallbackTimerRef.current = setTimeout(() => {
+      onTechEvent("markerNotFound20s");
+      setState("fallback-suggested");
+    }, FALLBACK_SUGGEST_MS);
+  }, [clearTimers, onTechEvent]);
+
   const stop = useCallback(() => {
     clearTimers();
     try {
@@ -69,6 +83,8 @@ export function useArController({ targetIndex, targetsMindUrl, onTechEvent }: Us
     } catch {
       // 카메라가 이미 정지된 경우 등은 무시한다.
     }
+    lessonSceneRef.current?.dispose();
+    lessonSceneRef.current = null;
     mindArRef.current = null;
     setState("stopped");
   }, [clearTimers]);
@@ -83,7 +99,10 @@ export function useArController({ targetIndex, targetsMindUrl, onTechEvent }: Us
 
     setState("requesting-permission");
     try {
-      const { MindARThree } = await import("../vendor/mind-ar/mindar-image-three.prod.js");
+      const [{ MindARThree }, { createLessonArScene }] = await Promise.all([
+        import("../vendor/mind-ar/mindar-image-three.prod.js"),
+        import("./ar-scenes"),
+      ]);
       const mindarThree = new MindARThree({
         container: containerRef.current,
         imageTargetSrc: targetsMindUrl,
@@ -95,6 +114,9 @@ export function useArController({ targetIndex, targetsMindUrl, onTechEvent }: Us
       mindArRef.current = mindarThree;
 
       const anchor = mindarThree.addAnchor(targetIndex);
+      const lessonScene = createLessonArScene(targetIndex);
+      lessonSceneRef.current = lessonScene;
+      anchor.group.add(lessonScene.group);
       anchor.onTargetFound = () => {
         clearTimers();
         setState("found");
@@ -102,23 +124,19 @@ export function useArController({ targetIndex, targetsMindUrl, onTechEvent }: Us
       anchor.onTargetLost = () => {
         // 마커 유실 시 AR 관찰만 일시 정지하고, 이미 진행 중인 2D 조작 상태는 초기화하지 않는다.
         setState("searching");
+        startSearchTimers();
       };
 
       setState("loading");
       await mindarThree.start();
+      const animationStartedAt = performance.now();
       mindarThree.renderer.setAnimationLoop(() => {
+        lessonScene.update((performance.now() - animationStartedAt) / 1000);
         mindarThree.renderer.render(mindarThree.scene, mindarThree.camera);
       });
 
       setState("searching");
-      slowTimerRef.current = setTimeout(() => {
-        onTechEvent("markerNotFound10s");
-        setState("slow-search");
-      }, SLOW_SEARCH_MS);
-      fallbackTimerRef.current = setTimeout(() => {
-        onTechEvent("markerNotFound20s");
-        setState("fallback-suggested");
-      }, FALLBACK_SUGGEST_MS);
+      startSearchTimers();
     } catch (err) {
       const name = err instanceof DOMException ? err.name : "";
       if (name === "NotAllowedError" || name === "PermissionDeniedError") {
@@ -129,7 +147,7 @@ export function useArController({ targetIndex, targetsMindUrl, onTechEvent }: Us
         setState("camera-start-failed");
       }
     }
-  }, [targetIndex, targetsMindUrl, onTechEvent, clearTimers]);
+  }, [targetIndex, targetsMindUrl, onTechEvent, clearTimers, startSearchTimers]);
 
   useEffect(() => {
     return () => {
@@ -140,6 +158,8 @@ export function useArController({ targetIndex, targetsMindUrl, onTechEvent }: Us
       } catch {
         // 언마운트 시 정리 실패는 무시한다.
       }
+      lessonSceneRef.current?.dispose();
+      lessonSceneRef.current = null;
     };
   }, [clearTimers]);
 

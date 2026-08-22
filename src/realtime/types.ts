@@ -19,6 +19,9 @@ export interface StudentRealtimeRecord {
   lessonId: 1 | 2 | 3;
   phase: string;
   mode: "ar" | "non-ar";
+  gameStage?: "observe" | "missions" | "questions";
+  completedMissionCount?: number;
+  currentMissionId?: string;
   completedQuestionCount: number;
   score: number;
   lastSeenAt: number;

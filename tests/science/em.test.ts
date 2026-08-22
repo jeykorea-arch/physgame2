@@ -45,6 +45,11 @@ describe("radarRadialSpeedFromShift", () => {
   it("파장이 0 이하이면 무효 처리한다", () => {
     expect(radarRadialSpeedFromShift(0, 100).inputValid).toBe(false);
   });
+
+  it("도플러 편이의 부호를 보존해 접근(+)과 후퇴(−)를 구분한다", () => {
+    expect(radarRadialSpeedFromShift(0.03, 1200).radialSpeedMs).toBe(18);
+    expect(radarRadialSpeedFromShift(0.03, -1200).radialSpeedMs).toBe(-18);
+  });
 });
 
 describe("qualitativeYagiGain — SCI-ANT-01", () => {

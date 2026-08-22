@@ -18,9 +18,10 @@ describe("photoelectricMaxKineticEnergy — 회귀 시험 (docs/04)", () => {
     expect(result.maxKineticEnergyEv).toBeNull();
   });
 
-  it("문턱과 정확히 같으면(hf=φ) 방출 에너지가 0이 되어 방출로 보지 않는다", () => {
+  it("문턱과 정확히 같으면(hf=φ) Kmax=0인 경계 방출로 처리한다", () => {
     const result = photoelectricMaxKineticEnergy(2.0, 2.0);
-    expect(result.emitted).toBe(false);
+    expect(result.emitted).toBe(true);
+    expect(result.maxKineticEnergyEv).toBe(0);
   });
 });
 

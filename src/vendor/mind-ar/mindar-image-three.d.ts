@@ -16,6 +16,7 @@ declare module "*/mindar-image-three.prod.js" {
     start: () => Promise<void>;
     stop: () => void;
     addAnchor: (targetIndex: number) => {
+      group: import("three").Group;
       onTargetFound: (() => void) | null;
       onTargetLost: (() => void) | null;
     };

@@ -1,6 +1,6 @@
 {
   "lessonId": 2,
-  "contentVersion": "project-echo-prd-v1-2026-08-22",
+  "contentVersion": "project-echo-v2-corrected-2026-08-22",
   "markerVersion": "project-echo-3-lessons-2026-08-22",
   "storyIntro": "기록소가 반사 신호는 받았지만 목표의 거리·운동·방향·주파수를 뒤섞었다. M02를 스캔해 수신국을 복구하라.",
   "recallPrompts": [
@@ -48,13 +48,13 @@
         { "id": "C", "label": "항상 최댓값으로 측정된다" }
       ],
       "correctPredictionChoiceId": "A",
-      "controlLabel": "목표의 빔 방향 성분 v_r",
+      "controlLabel": "목표의 빔 방향 성분 v_r (+: 접근, −: 후퇴)",
       "controlMin": -60,
       "controlMax": 60,
       "controlStep": 2,
       "controlDefault": 20,
       "controlUnit": "m/s",
-      "verificationCaption": "레이더가 직접 측정하는 것은 빔 방향 성분인 방사 속도다. |Δf| = 2|v_r|/λ. 실제 속력과 항상 같다고 단정하지 않는다.",
+      "verificationCaption": "레이더가 직접 측정하는 것은 빔 방향 성분인 방사 속도다. 이 화면은 접근을 +, 후퇴를 −로 정해 Δf=2v_r/λ로 표시한다. 실제 속력 전체와 항상 같지는 않다.",
       "estimatedSeconds": 180
     },
     {
@@ -74,7 +74,7 @@
       "controlStep": 10,
       "controlDefault": 100,
       "controlUnit": "pF",
-      "verificationCaption": "야기 안테나는 주엽 방향 이득·감도가 크지만 후방 응답이 0이 되지 않는다. 공명 f0=1/(2π√LC), 실제 선택 곡선은 유한 대역폭을 가진 봉우리다.",
+      "verificationCaption": "야기 안테나는 주엽 방향 이득·감도가 크지만 후방 응답이 0이 되지 않는다. C를 약 200 pF로 맞추면 f0가 목표 3.559 MHz와 일치한다. 실제 선택 곡선은 한 점이 아닌 유한 폭의 봉우리다.",
       "estimatedSeconds": 270
     }
   ],

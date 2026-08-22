@@ -2,38 +2,52 @@ import { useEffect, useState } from "react";
 import { HomeScreen } from "./HomeScreen";
 import { LessonScreen } from "../lessons/LessonScreen";
 import { TeacherScreen } from "../teacher/TeacherScreen";
-
-type Route = { name: "home" } | { name: "lesson"; lessonId: 1 | 2 | 3 } | { name: "teacher" };
-
-function parseHash(hash: string): Route {
-  const clean = hash.replace(/^#\/?/, "");
-  if (clean === "teacher") return { name: "teacher" };
-  const match = clean.match(/^lesson\/(1|2|3)$/);
-  if (match) return { name: "lesson", lessonId: Number(match[1]) as 1 | 2 | 3 };
-  return { name: "home" };
-}
+import { parseRoute, type Route } from "./routing";
 
 export function App() {
-  const [route, setRoute] = useState<Route>(() => parseHash(window.location.hash));
-  // 선생님이 실시간 수업 QR을 만들면 주소가 ?class=123456#/lesson/1 형태가 된다.
-  // 해시(#) 뒤가 아니라 앞의 쿼리 문자열이라 라우팅과 별개로 한 번만 읽는다.
-  const [joinClassCode] = useState<string | null>(() => new URLSearchParams(window.location.search).get("class"));
+  const [route, setRoute] = useState<Route>(() => parseRoute(window.location.href));
+  // physgame과 같은 ?lesson=1&class=123456 QR 주소의 수업 코드를 읽는다.
+  const [joinClassCode, setJoinClassCode] = useState<string | null>(() => new URLSearchParams(window.location.search).get("class"));
 
   useEffect(() => {
-    const onHashChange = () => setRoute(parseHash(window.location.hash));
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
+    const onLocationChange = () => setRoute(parseRoute(window.location.href));
+    window.addEventListener("hashchange", onLocationChange);
+    window.addEventListener("popstate", onLocationChange);
+    return () => {
+      window.removeEventListener("hashchange", onLocationChange);
+      window.removeEventListener("popstate", onLocationChange);
+    };
   }, []);
 
   function navigate(hash: string) {
     window.location.hash = hash;
   }
 
+  function goHome() {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("class");
+    url.searchParams.delete("lesson");
+    url.searchParams.delete("teacher");
+    url.hash = "";
+    window.history.replaceState(null, "", `${url.pathname}${url.search}`);
+    setJoinClassCode(null);
+    setRoute({ name: "home" });
+  }
+
+  function joinRealtimeClass(classCode: string, lessonId: 1 | 2 | 3) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("teacher");
+    url.searchParams.set("class", classCode);
+    url.searchParams.set("lesson", String(lessonId));
+    url.hash = "";
+    window.location.assign(url.toString());
+  }
+
   if (route.name === "teacher") {
-    return <TeacherScreen onGoHome={() => navigate("")} />;
+    return <TeacherScreen onGoHome={goHome} />;
   }
   if (route.name === "lesson") {
-    return <LessonScreen lessonId={route.lessonId} joinClassCode={joinClassCode} onGoHome={() => navigate("")} />;
+    return <LessonScreen lessonId={route.lessonId} joinClassCode={joinClassCode} onGoHome={goHome} />;
   }
-  return <HomeScreen onSelectLesson={(id) => navigate(`lesson/${id}`)} onOpenTeacher={() => navigate("teacher")} />;
+  return <HomeScreen onSelectLesson={(id) => navigate(`lesson/${id}`)} onJoinClass={joinRealtimeClass} onOpenTeacher={() => navigate("teacher")} />;
 }

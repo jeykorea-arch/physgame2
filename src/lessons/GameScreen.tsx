@@ -14,6 +14,7 @@ import { computeL2M1, computeL2M2 } from "./lesson2/calculations";
 import { L3Mission2 } from "./lesson3/L3Mission2";
 import { computeL3M1Frequency, computeL3M1Intensity, computeL3M3 } from "./lesson3/calculations";
 import { BossMission } from "./lesson3/BossMission";
+import { deriveGameRestoreState, type GameStage } from "./game-progress";
 
 const GAME_SECONDS_TOTAL = 20 * 60;
 const GAME_SECONDS_SOFT_WARNING = 18 * 60;
@@ -51,8 +52,9 @@ interface GameScreenProps {
   lessonMeta: LessonMeta;
   lessonContent: LessonContent;
   mode: LessonMode;
-  /** 새로고침·화면 잠금 복귀 시 20분 컷오프가 리셋되지 않도록 이전 경과 시간을 이어받는다. */
-  initialElapsedSeconds?: number;
+  /** 새로고침·화면 잠금 복귀 시 미션·문항·20분 타이머를 함께 복원한다. */
+  initialProgress?: ProgressRecord | null;
+  initialAnswers?: AnswerRecord[];
   /** 실시간 수업에 참가한 경우에만 값이 있다. null이면 실시간 갱신을 전혀 시도하지 않는다. */
   realtimeClassCode?: string | null;
   onGameComplete: (reason: ForcedSaveReason) => void;
@@ -62,18 +64,36 @@ export function GameScreen({
   lessonMeta,
   lessonContent,
   mode,
-  initialElapsedSeconds = 0,
+  initialProgress = null,
+  initialAnswers = [],
   realtimeClassCode = null,
   onGameComplete,
 }: GameScreenProps) {
-  const [stage, setStage] = useState<"observe" | "missions" | "questions">("observe");
-  const [missionIndex, setMissionIndex] = useState(0);
-  const [completedMissionIds, setCompletedMissionIds] = useState<string[]>([]);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [completedQuestionIds, setCompletedQuestionIds] = useState<string[]>([]);
-  const [totalScore, setTotalScore] = useState(0);
+  const [restoreState] = useState(() => deriveGameRestoreState(lessonContent, initialProgress, initialAnswers));
+  const [stage, setStage] = useState<GameStage>(restoreState.stage);
+  const [missionIndex, setMissionIndex] = useState(restoreState.missionIndex);
+  const [completedMissionIds, setCompletedMissionIds] = useState<string[]>(restoreState.completedMissionIds);
+  const [questionIndex, setQuestionIndex] = useState(restoreState.questionIndex);
+  const [completedQuestionIds, setCompletedQuestionIds] = useState<string[]>(restoreState.completedQuestionIds);
+  const [totalScore, setTotalScore] = useState(restoreState.totalScore);
+  const initialElapsedSeconds = initialProgress?.elapsedGameSeconds ?? 0;
   const [elapsedSeconds, setElapsedSeconds] = useState(initialElapsedSeconds);
   const completedRef = useRef(false);
+  const snapshotRef = useRef<ProgressRecord>(null!);
+
+  snapshotRef.current = {
+    lessonId: lessonMeta.id,
+    mode,
+    phase: "game",
+    gameStage: stage,
+    missionId: stage === "missions" ? lessonContent.missions[missionIndex]?.id ?? null : null,
+    questionId: stage === "questions" ? lessonContent.questions[questionIndex]?.id ?? null : null,
+    completedMissionIds,
+    completedQuestionIds,
+    elapsedGameSeconds: elapsedSeconds,
+    forcedSaveReason: null,
+    updatedAt: new Date().toISOString(),
+  };
 
   useEffect(() => {
     const startedAt = Date.now() - initialElapsedSeconds * 1000;
@@ -84,6 +104,26 @@ export function GameScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (!realtimeClassCode) return;
+    const currentMissionId = stage === "missions" ? lessonContent.missions[missionIndex]?.id ?? "" : "";
+    import("../realtime/classSession")
+      .then(({ updateStudentProgress }) =>
+        updateStudentProgress(realtimeClassCode, {
+          phase: "game",
+          mode,
+          gameStage: stage,
+          completedMissionCount: completedMissionIds.length,
+          currentMissionId,
+          completedQuestionCount: completedQuestionIds.length,
+          score: totalScore,
+        }),
+      )
+      .catch(() => {
+        // 실시간 연결 실패는 로컬 게임 진행을 막지 않는다.
+      });
+  }, [completedMissionIds.length, completedQuestionIds.length, lessonContent.missions, missionIndex, mode, realtimeClassCode, stage, totalScore]);
+
   const finish = (reason: ForcedSaveReason, completedQuestionIdsOverride?: string[]) => {
     if (completedRef.current) return;
     completedRef.current = true;
@@ -91,6 +131,7 @@ export function GameScreen({
       lessonId: lessonMeta.id,
       mode,
       phase: "explanation",
+      gameStage: "questions",
       missionId: null,
       questionId: null,
       completedMissionIds,
@@ -111,20 +152,12 @@ export function GameScreen({
   }, [elapsedSeconds]);
 
   useEffect(() => {
-    const handlePageHide = () => {
+    const persistCurrent = (reason: "pagehide" | null = null) => {
       if (completedRef.current) return;
-      saveProgress({
-        lessonId: lessonMeta.id,
-        mode,
-        phase: "game",
-        missionId: lessonContent.missions[missionIndex]?.id ?? null,
-        questionId: lessonContent.questions[questionIndex]?.id ?? null,
-        completedMissionIds,
-        completedQuestionIds,
-        elapsedGameSeconds: elapsedSeconds,
-        forcedSaveReason: "pagehide",
-        updatedAt: new Date().toISOString(),
-      });
+      saveProgress({ ...snapshotRef.current, forcedSaveReason: reason });
+    };
+    const handlePageHide = () => {
+      persistCurrent("pagehide");
       if (realtimeClassCode) {
         // pagehide 중 비동기 네트워크 요청은 끝까지 완료된다는 보장이 없다. 최선 노력으로만 보낸다.
         import("../realtime/classSession")
@@ -132,16 +165,40 @@ export function GameScreen({
           .catch(() => {});
       }
     };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") persistCurrent("pagehide");
+    };
+    const periodicSave = window.setInterval(() => persistCurrent(), 5_000);
     window.addEventListener("pagehide", handlePageHide);
-    return () => window.removeEventListener("pagehide", handlePageHide);
-  }, [lessonMeta.id, mode, missionIndex, questionIndex, completedMissionIds, completedQuestionIds, elapsedSeconds, lessonContent, realtimeClassCode]);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.clearInterval(periodicSave);
+      window.removeEventListener("pagehide", handlePageHide);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [realtimeClassCode]);
 
   function handleMissionComplete(missionId: string) {
-    setCompletedMissionIds((prev) => [...prev, missionId]);
+    const updatedCompletedMissionIds = completedMissionIds.includes(missionId) ? completedMissionIds : [...completedMissionIds, missionId];
+    setCompletedMissionIds(updatedCompletedMissionIds);
     if (missionIndex + 1 < lessonContent.missions.length) {
-      setMissionIndex((i) => i + 1);
+      const nextMissionIndex = missionIndex + 1;
+      setMissionIndex(nextMissionIndex);
+      saveProgress({
+        ...snapshotRef.current,
+        gameStage: "missions",
+        missionId: lessonContent.missions[nextMissionIndex].id,
+        completedMissionIds: updatedCompletedMissionIds,
+      });
     } else {
       setStage("questions");
+      saveProgress({
+        ...snapshotRef.current,
+        gameStage: "questions",
+        missionId: null,
+        questionId: lessonContent.questions[questionIndex].id,
+        completedMissionIds: updatedCompletedMissionIds,
+      });
     }
   }
 
@@ -174,7 +231,14 @@ export function GameScreen({
     }
 
     if (questionIndex + 1 < lessonContent.questions.length) {
-      setQuestionIndex((i) => i + 1);
+      const nextQuestionIndex = questionIndex + 1;
+      setQuestionIndex(nextQuestionIndex);
+      saveProgress({
+        ...snapshotRef.current,
+        gameStage: "questions",
+        questionId: lessonContent.questions[nextQuestionIndex].id,
+        completedQuestionIds: updatedCompletedQuestionIds,
+      });
     } else {
       finish("complete", updatedCompletedQuestionIds);
     }
@@ -212,7 +276,7 @@ export function GameScreen({
             onObserved={() => setStage("missions")}
           />
         ) : (
-          <NonArCard arObservationText={lessonContent.storyIntro} onObserved={() => setStage("missions")} />
+          <NonArCard targetIndex={targetIndexForLesson(lessonMeta)} arObservationText={lessonContent.storyIntro} onObserved={() => setStage("missions")} />
         ))}
 
       {stage === "missions" && renderMission(lessonContent.missions[missionIndex], lessonContent, () => handleMissionComplete(lessonContent.missions[missionIndex].id))}

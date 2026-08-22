@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useArController } from "./ar-controller";
 import type { TechEventCode } from "../storage/models";
+import { ObservationVisual } from "./ObservationVisual";
 
 interface ArScannerProps {
   targetIndex: number;
@@ -75,6 +76,7 @@ export function ArScanner({ targetIndex, targetsMindUrl, arObservationText, onTe
       {state === "found" && (
         <>
           <p>{arObservationText}</p>
+          <ObservationVisual targetIndex={targetIndex} />
           <p className="qualitative-tag">30~60초 정도 관찰한 뒤 다음으로 진행하세요.</p>
           <button onClick={onObserved}>관찰 완료, 다음으로</button>
         </>

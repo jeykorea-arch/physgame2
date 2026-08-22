@@ -2,6 +2,7 @@ node_modules/
 dist/
 dev-dist/
 releases/
+outputs/
 .env
 .env.local
 *.local

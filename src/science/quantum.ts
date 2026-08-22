@@ -24,7 +24,7 @@ export function photoelectricMaxKineticEnergy(photonEnergyEv: number, workFuncti
     return { maxKineticEnergyEv: null, emitted: false, inputValid: false };
   }
   const k = photonEnergyEv - workFunctionEv;
-  if (k <= 0) {
+  if (k < 0) {
     return { maxKineticEnergyEv: null, emitted: false, inputValid: true };
   }
   return { maxKineticEnergyEv: k, emitted: true, inputValid: true };

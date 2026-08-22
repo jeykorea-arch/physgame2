@@ -4,6 +4,8 @@ export interface QuestionAggregate {
   questionId: string;
   totalAnswered: number;
   firstAttemptCorrect: number;
+  secondAttemptCorrect: number;
+  resolvedByHint: number;
   firstAttemptAccuracyPct: number;
 }
 
@@ -55,11 +57,13 @@ export function aggregateResults(exportsList: AnonymousExport[]): AggregateResul
       for (const answer of lesson.answers) {
         let q = agg.questions.find((x) => x.questionId === answer.questionId);
         if (!q) {
-          q = { questionId: answer.questionId, totalAnswered: 0, firstAttemptCorrect: 0, firstAttemptAccuracyPct: 0 };
+          q = { questionId: answer.questionId, totalAnswered: 0, firstAttemptCorrect: 0, secondAttemptCorrect: 0, resolvedByHint: 0, firstAttemptAccuracyPct: 0 };
           agg.questions.push(q);
         }
         q.totalAnswered += 1;
         if (answer.attempt === 1 && answer.correct) q.firstAttemptCorrect += 1;
+        else if (answer.attempt === 2 && answer.correct) q.secondAttemptCorrect += 1;
+        else if (!answer.correct) q.resolvedByHint += 1;
       }
     }
   }
@@ -78,10 +82,10 @@ export function aggregateResults(exportsList: AnonymousExport[]): AggregateResul
 }
 
 export function aggregateToCsv(result: AggregateResult): string {
-  const rows = ["lessonId,questionId,totalAnswered,firstAttemptCorrect,firstAttemptAccuracyPct"];
+  const rows = ["lessonId,questionId,totalAnswered,firstAttemptCorrect,secondAttemptCorrect,resolvedByHint,firstAttemptAccuracyPct"];
   for (const lesson of result.lessons) {
     for (const q of lesson.questions) {
-      rows.push(`${lesson.lessonId},${q.questionId},${q.totalAnswered},${q.firstAttemptCorrect},${q.firstAttemptAccuracyPct.toFixed(1)}`);
+      rows.push(`${lesson.lessonId},${q.questionId},${q.totalAnswered},${q.firstAttemptCorrect},${q.secondAttemptCorrect},${q.resolvedByHint},${q.firstAttemptAccuracyPct.toFixed(1)}`);
     }
   }
   return rows.join("\n");

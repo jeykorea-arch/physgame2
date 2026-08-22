@@ -14,9 +14,18 @@ Claude는 여러분의 Google 계정에 로그인할 수 없어 이 단계는 �
 6. 나오는 `firebaseConfig` 값 6개 중 5개(apiKey, authDomain, databaseURL, projectId, appId)를 기록해 둔다.
 
 이 값들은 비밀 키가 아니다. 브라우저 코드에 그대로 보이는 공개 웹 설정값이며, 실제 접근 제어는
-`database.rules.json`의 규칙이 담당한다.
+`database.rules.json`의 규칙이 담당한다. 데이터는 `physgame`의 `classes`와 섞이지 않도록
+`projectEchoClasses` 루트에만 저장된다.
 
 ## 2. 로컬에서 켜보기
+
+### 실행 패키지에서 바로 설정
+
+압축을 푼 뒤 `dist/firebase-config.json`을 열어 `enabled`를 `true`로 바꾸고 Firebase 웹 설정값 5개를
+채운다. 다시 빌드할 필요 없이 `PROJECT_ECHO_실행.cmd`를 실행하면 된다. 이 파일의 값은 브라우저에
+공개되는 Firebase 웹 설정값이며, 관리자 비밀 키를 넣으면 안 된다.
+
+### 소스 개발 환경에서 설정
 
 `web-app/.env`에 값을 채운다.
 
@@ -29,7 +38,13 @@ VITE_FIREBASE_PROJECT_ID=...
 VITE_FIREBASE_APP_ID=...
 ```
 
-`npm run dev` 후 교사용 화면에 "실시간 수업 진행판" 패널이 나타나면 성공이다.
+`npm run dev` 후 교사용 화면에서 다음이 보이면 성공이다.
+
+1. 1·2·3차시 탭 중 수업할 차시를 선택한다.
+2. **실시간 수업 열기**를 누르면 6자리 코드와 해당 차시 QR이 생성된다.
+3. 학생이 QR을 스캔하고 수업용 별칭을 입력하면 현재 접속 인원과 학생별 미션·문항 진행률이 표시된다.
+4. 차시 탭을 바꾸면 같은 수업 코드를 유지하면서 Firebase 활성 차시와 QR이 함께 바뀐다.
+5. 수업이 끝나면 **실시간 수업 종료**를 눌러 새 학생 참가를 막는다.
 
 ## 3. 배포(GitHub Pages)에서 켜기
 
@@ -42,10 +57,13 @@ VITE_FIREBASE_APP_ID=...
 그 뒤 Actions 탭에서 `Deploy GitHub Pages` 워크플로를 다시 실행하면(또는 아무 커밋이나 push하면)
 반영된다.
 
+다른 정적 호스팅에 `dist`를 직접 올릴 때는 `dist/firebase-config.json`을 채운 상태로 업로드해도 된다.
+
 ## 개인정보 범위 (`database.rules.json`이 강제하는 것)
 
 - 학생은 실명·학번이 아닌 2~12자 "수업용 별칭"만 입력한다.
-- 전송되는 값: 별칭, 접속 여부, 차시, 단계, AR/비AR 모드, 완료 문항 수, 점수, 문항별 선택 번호·정오·시도 횟수, 마지막 접속 시각.
+- 전송되는 값: 별칭, 접속 여부, 차시, 단계, AR/비AR 모드, 완료 미션·문항 수, 현재 미션 ID,
+  점수, 문항별 선택 번호·정오·시도 횟수, 마지막 접속 시각.
 - 전송하지 않는 값: 실명, 학번, 사진·영상, 카메라 프레임, 위치, 자유서술·수치 입력 원문.
 - 학생은 자기 자신의 데이터만 쓸 수 있고 다른 학생 데이터를 읽을 수 없다. 수업을 연 교사만 전체
   명단을 읽을 수 있다(모두 `database.rules.json`의 `.read`/`.write`/`.validate` 규칙으로 강제됨).

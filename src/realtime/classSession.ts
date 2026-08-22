@@ -1,90 +1,184 @@
 import { getFirebase } from "./firebaseClient";
 import type { ClassPublicInfo, StudentAnswerRecord, StudentRealtimeRecord } from "./types";
 
-/** 6자리 숫자 수업 코드. 학번·이름이 아니라 무작위 코드로만 반을 구분한다. */
-function generateClassCode(): string {
-  return String(Math.floor(100000 + Math.random() * 900000));
+const activePresence = new Map<string, { heartbeat: number; cancelDisconnect: () => Promise<void> }>();
+
+/** 수업 코드는 학생의 개인정보가 아닌 6자리 무작위 숫자다. */
+export function normalizeClassCode(value: string): string {
+  return value.replace(/\D/g, "").slice(0, 6);
 }
 
-export async function createClass(lessonId: 1 | 2 | 3): Promise<{ classCode: string; uid: string }> {
+function generateClassCode(): string {
+  const random = new Uint32Array(1);
+  crypto.getRandomValues(random);
+  return String(100000 + (random[0] % 900000));
+}
+
+/** 저장한 코드가 같은 익명 교사 계정의 것이면 재사용하고, 아니면 새 코드를 만든다. */
+export async function openTeacherClass(
+  lessonId: 1 | 2 | 3,
+  preferredCode = "",
+): Promise<{ classCode: string; uid: string }> {
   const { auth, db } = await getFirebase();
-  const { ref, set } = await import("firebase/database");
-  const classCode = generateClassCode();
+  const { ref, set, update } = await import("firebase/database");
+  const uid = auth.currentUser!.uid;
+  const normalizedPreferred = normalizeClassCode(preferredCode);
+
+  if (normalizedPreferred.length === 6) {
+    try {
+      await update(ref(db, `projectEchoClasses/${normalizedPreferred}/public`), { lessonId, active: true });
+      return { classCode: normalizedPreferred, uid };
+    } catch {
+      // 브라우저 인증이 바뀌었거나 다른 수업의 코드이면 새 코드를 만든다.
+    }
+  }
+
   const info: ClassPublicInfo = { lessonId, active: true, createdAt: Date.now() };
-  await set(ref(db, `classes/${classCode}`), { ownerUid: auth.currentUser!.uid, public: info });
-  return { classCode, uid: auth.currentUser!.uid };
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const classCode = generateClassCode();
+    try {
+      await set(ref(db, `projectEchoClasses/${classCode}`), { ownerUid: uid, public: info });
+      return { classCode, uid };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("중복되지 않는 수업 코드를 만들지 못했습니다.");
+}
+
+/** 기존 호출 호환용. */
+export async function createClass(lessonId: 1 | 2 | 3): Promise<{ classCode: string; uid: string }> {
+  return openTeacherClass(lessonId);
+}
+
+export async function setClassLesson(classCode: string, lessonId: 1 | 2 | 3): Promise<void> {
+  const { db } = await getFirebase();
+  const { ref, update } = await import("firebase/database");
+  await update(ref(db, `projectEchoClasses/${normalizeClassCode(classCode)}/public`), { lessonId, active: true });
 }
 
 export async function closeClass(classCode: string): Promise<void> {
   const { db } = await getFirebase();
   const { ref, update } = await import("firebase/database");
-  await update(ref(db, `classes/${classCode}/public`), { active: false });
+  await update(ref(db, `projectEchoClasses/${normalizeClassCode(classCode)}/public`), { active: false });
 }
 
 export async function getClassPublicInfo(classCode: string): Promise<ClassPublicInfo | null> {
+  const normalized = normalizeClassCode(classCode);
+  if (normalized.length !== 6) return null;
   const { db } = await getFirebase();
   const { ref, get } = await import("firebase/database");
-  const snap = await get(ref(db, `classes/${classCode}/public`));
+  const snap = await get(ref(db, `projectEchoClasses/${normalized}/public`));
   return snap.exists() ? (snap.val() as ClassPublicInfo) : null;
 }
 
-/** 학생이 6자리 코드로 수업에 참가한다. alias는 실명·학번이 아닌 2~12자 수업용 별칭이다. */
+/** 학생을 연결하고 onDisconnect·30초 heartbeat로 실제 접속 상태를 유지한다. */
 export async function joinClass(
-  classCode: string,
-  alias: string,
+  classCodeInput: string,
+  aliasInput: string,
   lessonId: 1 | 2 | 3,
-  mode: "ar" | "non-ar"
+  mode: "ar" | "non-ar",
+  initial?: Partial<Pick<StudentRealtimeRecord, "phase" | "gameStage" | "completedMissionCount" | "currentMissionId" | "completedQuestionCount" | "score">>,
 ): Promise<{ uid: string }> {
+  const classCode = normalizeClassCode(classCodeInput);
+  const publicInfo = await getClassPublicInfo(classCode);
+  if (!publicInfo?.active) throw new Error("종료되었거나 존재하지 않는 수업 코드입니다.");
+  if (publicInfo.lessonId !== lessonId) throw new Error(`이 코드는 ${publicInfo.lessonId}차시 수업용입니다.`);
+
+  const alias = aliasInput.trim().replace(/\s+/g, " ").slice(0, 12);
+  if (alias.length < 2) throw new Error("2~12자의 수업용 별칭을 입력해 주세요.");
+
   const { auth, db } = await getFirebase();
-  const { ref, set } = await import("firebase/database");
+  const { onDisconnect, ref, serverTimestamp, update } = await import("firebase/database");
+  const uid = auth.currentUser!.uid;
+  const studentRef = ref(db, `projectEchoClasses/${classCode}/students/${uid}`);
   const record: StudentRealtimeRecord = {
     alias,
     connected: true,
     lessonId,
-    phase: "entry",
+    phase: initial?.phase ?? "entry",
     mode,
-    completedQuestionCount: 0,
-    score: 0,
+    gameStage: initial?.gameStage ?? "observe",
+    completedMissionCount: initial?.completedMissionCount ?? 0,
+    currentMissionId: initial?.currentMissionId ?? "",
+    completedQuestionCount: initial?.completedQuestionCount ?? 0,
+    score: initial?.score ?? 0,
     lastSeenAt: Date.now(),
   };
-  await set(ref(db, `classes/${classCode}/students/${auth.currentUser!.uid}`), record);
-  return { uid: auth.currentUser!.uid };
+
+  await update(studentRef, record);
+
+  const previous = activePresence.get(classCode);
+  if (previous) {
+    window.clearInterval(previous.heartbeat);
+    await previous.cancelDisconnect().catch(() => undefined);
+  }
+
+  const disconnectAction = onDisconnect(studentRef);
+  await disconnectAction.update({ connected: false, lastSeenAt: serverTimestamp() });
+  const heartbeat = window.setInterval(() => {
+    update(studentRef, { connected: true, lastSeenAt: Date.now() }).catch(() => undefined);
+  }, 30_000);
+  activePresence.set(classCode, { heartbeat, cancelDisconnect: () => disconnectAction.cancel() });
+
+  return { uid };
 }
 
 export async function updateStudentProgress(
-  classCode: string,
-  patch: Partial<Pick<StudentRealtimeRecord, "phase" | "mode" | "completedQuestionCount" | "score">>
+  classCodeInput: string,
+  patch: Partial<Pick<StudentRealtimeRecord, "phase" | "mode" | "gameStage" | "completedMissionCount" | "currentMissionId" | "completedQuestionCount" | "score">>,
 ): Promise<void> {
+  const classCode = normalizeClassCode(classCodeInput);
   const { auth, db } = await getFirebase();
   const { ref, update } = await import("firebase/database");
-  await update(ref(db, `classes/${classCode}/students/${auth.currentUser!.uid}`), { ...patch, lastSeenAt: Date.now() });
-}
-
-export async function recordStudentAnswer(classCode: string, questionId: string, answer: StudentAnswerRecord): Promise<void> {
-  const { auth, db } = await getFirebase();
-  const { ref, update } = await import("firebase/database");
-  await update(ref(db, `classes/${classCode}/students/${auth.currentUser!.uid}`), {
-    [`answers/${questionId}`]: answer,
+  await update(ref(db, `projectEchoClasses/${classCode}/students/${auth.currentUser!.uid}`), {
+    ...patch,
+    connected: true,
     lastSeenAt: Date.now(),
   });
 }
 
-export async function markDisconnected(classCode: string): Promise<void> {
+export async function recordStudentAnswer(classCodeInput: string, questionId: string, answer: StudentAnswerRecord): Promise<void> {
+  const classCode = normalizeClassCode(classCodeInput);
   const { auth, db } = await getFirebase();
   const { ref, update } = await import("firebase/database");
-  await update(ref(db, `classes/${classCode}/students/${auth.currentUser!.uid}`), { connected: false, lastSeenAt: Date.now() });
+  await update(ref(db, `projectEchoClasses/${classCode}/students/${auth.currentUser!.uid}`), {
+    [`answers/${questionId}`]: answer,
+    connected: true,
+    lastSeenAt: Date.now(),
+  });
 }
 
-/** 교사 화면에서 학생 명단을 실시간으로 구독한다. 반환값을 호출하면 구독을 해제한다. */
+export async function markDisconnected(classCodeInput: string): Promise<void> {
+  const classCode = normalizeClassCode(classCodeInput);
+  const presence = activePresence.get(classCode);
+  if (presence) {
+    window.clearInterval(presence.heartbeat);
+    await presence.cancelDisconnect().catch(() => undefined);
+    activePresence.delete(classCode);
+  }
+  const { auth, db } = await getFirebase();
+  const { ref, update } = await import("firebase/database");
+  await update(ref(db, `projectEchoClasses/${classCode}/students/${auth.currentUser!.uid}`), {
+    connected: false,
+    lastSeenAt: Date.now(),
+  });
+}
+
+/** 교사 화면에서 학생 명단을 실시간 구독한다. */
 export async function subscribeToClassRoster(
-  classCode: string,
-  onChange: (students: Record<string, StudentRealtimeRecord>) => void
+  classCodeInput: string,
+  onChange: (students: Record<string, StudentRealtimeRecord>) => void,
+  onError?: (message: string) => void,
 ): Promise<() => void> {
+  const classCode = normalizeClassCode(classCodeInput);
   const { db } = await getFirebase();
   const { ref, onValue } = await import("firebase/database");
-  const studentsRef = ref(db, `classes/${classCode}/students`);
-  const unsubscribe = onValue(studentsRef, (snap) => {
-    onChange((snap.val() as Record<string, StudentRealtimeRecord>) ?? {});
-  });
-  return unsubscribe;
+  const studentsRef = ref(db, `projectEchoClasses/${classCode}/students`);
+  return onValue(
+    studentsRef,
+    (snap) => onChange((snap.val() as Record<string, StudentRealtimeRecord>) ?? {}),
+    (error) => onError?.(error.message),
+  );
 }

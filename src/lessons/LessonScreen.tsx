@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { ContentContract, LessonContent } from "../content/types";
 import { loadContentContract, loadLessonContent } from "../content/loader";
 import type { LessonMode, LessonPhase } from "../storage/models";
-import { createInitialProgress, getOrCreateSession, loadProgress, saveProgress } from "../storage/progress";
+import { createInitialProgress, getOrCreateSession, loadAnswers, loadProgress, saveProgress } from "../storage/progress";
 import { EntryScreen } from "./EntryScreen";
 import { RecallScreen } from "./RecallScreen";
 import { GameScreen } from "./GameScreen";
@@ -17,6 +17,20 @@ interface LessonScreenProps {
   lessonId: 1 | 2 | 3;
   joinClassCode: string | null;
   onGoHome: () => void;
+}
+
+function realtimeResumeState(lessonId: 1 | 2 | 3, mode: LessonMode) {
+  const progress = loadProgress(lessonId);
+  const answers = loadAnswers(lessonId);
+  return {
+    phase: progress?.phase ?? "entry",
+    mode,
+    gameStage: progress?.gameStage ?? "observe",
+    completedMissionCount: progress?.completedMissionIds.length ?? 0,
+    currentMissionId: progress?.missionId ?? "",
+    completedQuestionCount: progress?.completedQuestionIds.length ?? 0,
+    score: answers.reduce((sum, answer) => sum + answer.score, 0),
+  } as const;
 }
 
 export function LessonScreen({ lessonId, joinClassCode, onGoHome }: LessonScreenProps) {
@@ -44,9 +58,21 @@ export function LessonScreen({ lessonId, joinClassCode, onGoHome }: LessonScreen
         setLessonContent(l);
 
         const existing = loadProgress(lessonId);
-        if (existing && existing.phase !== "complete" && existing.phase !== "entry") {
+        if (existing && existing.phase !== "entry") {
           setMode(existing.mode);
           setPhase(existing.phase);
+        }
+
+        const savedJoin = getRealtimeJoin();
+        if (joinClassCode && isRealtimeAvailable() && savedJoin?.classCode === joinClassCode) {
+          const restoredMode = existing?.mode ?? "non-ar";
+          import("../realtime/classSession")
+            .then(({ joinClass }) =>
+              joinClass(joinClassCode, savedJoin.alias, lessonId, restoredMode, realtimeResumeState(lessonId, restoredMode)),
+            )
+            .catch(() => {
+              // 수업이 이미 종료되었어도 학생의 로컬 진행은 그대로 복원한다.
+            });
         }
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : String(e));
@@ -55,7 +81,7 @@ export function LessonScreen({ lessonId, joinClassCode, onGoHome }: LessonScreen
     return () => {
       cancelled = true;
     };
-  }, [lessonId]);
+  }, [joinClassCode, lessonId]);
 
   if (needsAliasPrompt && joinClassCode) {
     return (
@@ -119,15 +145,17 @@ export function LessonScreen({ lessonId, joinClassCode, onGoHome }: LessonScreen
         <EntryScreen
           lessonMeta={lessonMeta}
           storyIntro={lessonContent.storyIntro}
-          onChooseMode={(m) => {
+          onChooseMode={async (m) => {
             setMode(m);
             if (joinClassCode && pendingAlias) {
-              import("../realtime/classSession")
-                .then(({ joinClass }) => joinClass(joinClassCode, pendingAlias, lessonId, m))
-                .then(() => setRealtimeJoin({ classCode: joinClassCode, alias: pendingAlias }))
-                .catch(() => {
-                  // 실시간 참가 실패해도 비실시간으로 계속 진행할 수 있다.
-                });
+              try {
+                const { joinClass } = await import("../realtime/classSession");
+                await joinClass(joinClassCode, pendingAlias, lessonId, m, realtimeResumeState(lessonId, m));
+                setRealtimeJoin({ classCode: joinClassCode, alias: pendingAlias });
+              } catch (joinError) {
+                setError(joinError instanceof Error ? joinError.message : "실시간 수업 참가에 실패했습니다.");
+                return;
+              }
             }
             goPhase("recall", m);
           }}
@@ -141,7 +169,8 @@ export function LessonScreen({ lessonId, joinClassCode, onGoHome }: LessonScreen
           lessonMeta={lessonMeta}
           lessonContent={lessonContent}
           mode={mode}
-          initialElapsedSeconds={loadProgress(lessonId)?.elapsedGameSeconds ?? 0}
+          initialProgress={loadProgress(lessonId)}
+          initialAnswers={loadAnswers(lessonId)}
           realtimeClassCode={activeClassCode}
           onGameComplete={() => goPhase("explanation")}
         />

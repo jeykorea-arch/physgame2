@@ -2,6 +2,7 @@ import { type ReactNode, useState } from "react";
 import type { ChoiceId, MissionScreenContent } from "../content/types";
 import { Stepper } from "../accessibility/Stepper";
 import type { Readout } from "./lesson1/calculations";
+import { MissionVisualization } from "./MissionVisualization";
 
 interface MissionCardProps {
   mission: MissionScreenContent;
@@ -57,6 +58,7 @@ export function MissionCard({ mission, computeReadout, extraControls, onComplete
             unit={mission.controlUnit}
             onChange={setControlValue}
           />
+          <MissionVisualization mission={mission} value={controlValue} />
           <div className="feedback-box">
             <strong>{readout.primaryLabel}: </strong>
             {readout.primaryValue}

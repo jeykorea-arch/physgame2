@@ -1,4 +1,4 @@
-import { env, isRealtimeTeacherBoardConfigured } from "../env";
+import { getRealtimeFirebaseConfig, isRealtimeTeacherBoardConfigured } from "../env";
 
 /**
  * Firebase SDK는 실시간 진행판이 실제로 켜져 있을 때만 동적으로 불러온다.
@@ -19,17 +19,18 @@ export async function getFirebase() {
   }
   if (!cached) {
     cached = (async () => {
+      const config = getRealtimeFirebaseConfig();
       const [{ initializeApp }, { getAuth, signInAnonymously, onAuthStateChanged }, { getDatabase }] = await Promise.all([
         import("firebase/app"),
         import("firebase/auth"),
         import("firebase/database"),
       ]);
       const app = initializeApp({
-        apiKey: env.firebase.apiKey,
-        authDomain: env.firebase.authDomain,
-        databaseURL: env.firebase.databaseURL,
-        projectId: env.firebase.projectId,
-        appId: env.firebase.appId,
+        apiKey: config.apiKey,
+        authDomain: config.authDomain,
+        databaseURL: config.databaseURL,
+        projectId: config.projectId,
+        appId: config.appId,
       });
       const auth = getAuth(app);
       const db = getDatabase(app);

@@ -29,6 +29,15 @@ export function getOrCreateSession(contentVersion: string, markerVersion: string
     return existing;
   }
   const now = new Date().toISOString();
+  if (existing && existing.contentVersion !== contentVersion) {
+    // 구 콘텐츠의 문항·진행을 새 버전과 섞지 않는다. 실시간 참가 정보는 수업 연결용이므로 유지한다.
+    for (const lessonId of [1, 2, 3]) {
+      localStorage.removeItem(storageKey.progress(lessonId));
+      localStorage.removeItem(storageKey.answers(lessonId));
+      localStorage.removeItem(storageKey.techEvents(lessonId));
+      localStorage.removeItem(storageKey.exitCheck(lessonId));
+    }
+  }
   const session: SessionRecord = {
     sessionId: createAnonymousSessionId(),
     contentVersion,
@@ -53,6 +62,7 @@ export function createInitialProgress(lessonId: 1 | 2 | 3, mode: LessonMode): Pr
     lessonId,
     mode,
     phase: "entry",
+    gameStage: "observe",
     missionId: null,
     questionId: null,
     completedMissionIds: [],

@@ -23,15 +23,15 @@ export interface RadarRadialSpeedResult {
 }
 
 /**
- * 단일 기지 송수신 레이더의 방사 속도 크기: |v_r| = |Δf|·λ / 2
- * 이 함수는 크기만 반환한다. 접근/후퇴 부호는 도플러 주파수 편이의 부호로 UI에서 별도로 표시하고,
- * "레이더가 측정하는 것은 빔 방향 성분(방사 속도)"이라는 라벨을 UI에서 항상 함께 보여준다.
+ * 단일 기지 송수신 레이더의 부호 있는 방사 속도: v_r = Δf·λ / 2.
+ * 이 앱에서는 Δf>0, v_r>0을 접근, Δf<0, v_r<0을 후퇴로 정의한다.
+ * 레이더가 측정하는 것은 빔 방향 성분(방사 속도)이며 실제 속력 전체와 같지 않을 수 있다.
  */
 export function radarRadialSpeedFromShift(wavelengthMeters: number, dopplerShiftHz: number): RadarRadialSpeedResult {
   if (!(wavelengthMeters > 0) || !Number.isFinite(dopplerShiftHz)) {
     return { radialSpeedMs: null, inputValid: false };
   }
-  return { radialSpeedMs: (Math.abs(dopplerShiftHz) * wavelengthMeters) / 2, inputValid: true };
+  return { radialSpeedMs: (dopplerShiftHz * wavelengthMeters) / 2, inputValid: true };
 }
 
 export interface LcResonanceResult {

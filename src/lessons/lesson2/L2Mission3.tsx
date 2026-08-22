@@ -1,7 +1,31 @@
 import { useState } from "react";
 import type { ChoiceId, MissionScreenContent } from "../../content/types";
 import { Stepper } from "../../accessibility/Stepper";
-import { computeLcResonance, computeYagiGain } from "./calculations";
+import { qualitativeSelectivityResponse } from "../../science/em";
+import { computeLcResonance, computeYagiGain, lcFrequencyHzForCapacitance, LESSON2_FIXED } from "./calculations";
+
+function LcResponsePlot({ capacitancePf }: { capacitancePf: number }) {
+  const f0 = lcFrequencyHzForCapacitance(capacitancePf);
+  const samples = Array.from({ length: 45 }, (_, i) => {
+    const frequencyHz = (1.5 + (i / 44) * 5) * 1e6;
+    return {
+      x: 12 + (i / 44) * 276,
+      y: 106 - qualitativeSelectivityResponse(frequencyHz, f0, LESSON2_FIXED.qualityFactor) * 82,
+    };
+  });
+  const targetX = 12 + (((LESSON2_FIXED.targetFrequencyHz / 1e6) - 1.5) / 5) * 276;
+  const path = samples.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+  return (
+    <svg viewBox="0 0 300 130" width="100%" role="img" aria-label="현재 LC 공명 곡선과 목표 수신 주파수">
+      <line x1="12" y1="106" x2="288" y2="106" stroke="currentColor" />
+      <line x1={targetX} y1="12" x2={targetX} y2="106" stroke="#ffd166" strokeDasharray="5 4" />
+      <path d={path} fill="none" stroke="#6fd3ff" strokeWidth="4" />
+      <text x="12" y="124" fill="currentColor" fontSize="10">1.5 MHz</text>
+      <text x="244" y="124" fill="currentColor" fontSize="10">6.5 MHz</text>
+      <text x={Math.min(230, targetX + 4)} y="20" fill="#ffd166" fontSize="10">목표 3.559 MHz</text>
+    </svg>
+  );
+}
 
 /** L2-M3는 "두 순차적 단일 조작"이다(content_contract.json). 안테나 방향 → LC 주파수 순서로 한 화면 한 조작을 지킨다. */
 export function L2Mission3({ mission, onComplete }: { mission: MissionScreenContent; onComplete: () => void }) {
@@ -70,8 +94,10 @@ export function L2Mission3({ mission, onComplete }: { mission: MissionScreenCont
             {lcReadout.primaryValue}
             {lcReadout.note && <p className="qualitative-tag">{lcReadout.note}</p>}
           </div>
+          <LcResponsePlot capacitancePf={capacitancePf} />
           <p>{mission.verificationCaption}</p>
-          <button onClick={onComplete}>증거 기록 완료</button>
+          {!lcReadout.completionReady && <p className="qualitative-tag">공명 봉우리를 목표 주파수에 맞춰 상대 응답 80% 이상을 만드세요.</p>}
+          <button disabled={!lcReadout.completionReady} onClick={onComplete}>증거 기록 완료</button>
         </>
       )}
     </div>

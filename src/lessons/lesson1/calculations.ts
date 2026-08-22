@@ -12,6 +12,7 @@ export interface Readout {
   primaryValue: string;
   note?: string;
   warning?: string;
+  completionReady?: boolean;
 }
 
 export function computeL1M1(slitWidthMicrons: number): Readout {

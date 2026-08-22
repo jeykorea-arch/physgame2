@@ -5,6 +5,7 @@ import { aggregateResults, aggregateToCsv, type AggregateResult } from "./aggreg
 import type { AnonymousExport } from "../storage/export";
 import { MarkerPrintSheet } from "./MarkerPrintSheet";
 import { RealtimeClassPanel } from "../realtime/RealtimeClassPanel";
+import { LESSON_LIVE_META } from "../realtime/teacherDashboard";
 
 const TIMELINE = [
   { label: "진입", minutes: 3 },
@@ -82,15 +83,28 @@ export function TeacherScreen({ onGoHome }: { onGoHome: () => void }) {
   const elapsedSec = elapsedSeconds % 60;
 
   return (
-    <div className="screen" style={{ maxWidth: 720 }}>
-      <div className="panel">
-        <h1>교사용 화면</h1>
+    <div className="screen teacher-screen">
+      <div className="panel teacher-console-header">
+        <div>
+          <span className="teacher-eyebrow">PROJECT ECHO · TEACHER CONSOLE</span>
+          <h1>교사용 수업 화면</h1>
+          <p>차시 선택 → QR 제시 → 학생 바로 접속 · 필요 시 실시간 진행 확인</p>
+        </div>
         <button className="secondary" onClick={onGoHome}>
           학생 화면으로
         </button>
       </div>
 
-      <MarkerPrintSheet />
+      <nav className="teacher-lesson-tabs" aria-label="QR과 진행 현황을 표시할 차시 선택">
+        {([1, 2, 3] as const).map((id) => (
+          <button key={id} className={lessonId === id ? "active" : ""} onClick={() => setLessonId(id)}>
+            <strong>{id}차시</strong>
+            <span>{LESSON_LIVE_META[id].title}</span>
+          </button>
+        ))}
+      </nav>
+
+      <RealtimeClassPanel lessonId={lessonId} />
 
       <div className="panel">
         <h2>45분 타이머</h2>
@@ -115,15 +129,10 @@ export function TeacherScreen({ onGoHome }: { onGoHome: () => void }) {
         </button>
       </div>
 
+      <MarkerPrintSheet />
+
       <div className="panel">
-        <h2>차시 선택 및 설명 카드</h2>
-        <div className="choice-list">
-          {([1, 2, 3] as const).map((id) => (
-            <button key={id} className="choice-button" data-state={lessonId === id ? "selected" : undefined} onClick={() => setLessonId(id)}>
-              {id}차시
-            </button>
-          ))}
-        </div>
+        <h2>{lessonId}차시 설명 카드</h2>
         {lessonContent?.teacherExplanationCards.map((card, i) => (
           <div className="feedback-box" key={i} style={{ marginTop: 8 }}>
             <strong>{card.title}</strong>
@@ -131,8 +140,6 @@ export function TeacherScreen({ onGoHome }: { onGoHome: () => void }) {
           </div>
         ))}
       </div>
-
-      <RealtimeClassPanel lessonId={lessonId} />
 
       <div className="panel">
         <h2>학생 결과 불러오기</h2>
@@ -159,7 +166,9 @@ export function TeacherScreen({ onGoHome }: { onGoHome: () => void }) {
                       <tr>
                         <th>문항</th>
                         <th>응답 수</th>
-                        <th>첫 시도 정답률</th>
+                         <th>첫 시도 정답률</th>
+                          <th>2차 시도 정답</th>
+                          <th>원리 안내 완료</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -168,6 +177,8 @@ export function TeacherScreen({ onGoHome }: { onGoHome: () => void }) {
                           <td>{q.questionId}</td>
                           <td>{q.totalAnswered}</td>
                           <td>{q.firstAttemptAccuracyPct.toFixed(1)}%</td>
+                          <td>{q.secondAttemptCorrect}</td>
+                          <td>{q.resolvedByHint}</td>
                         </tr>
                       ))}
                     </tbody>
