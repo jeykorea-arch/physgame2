@@ -30,6 +30,28 @@ describe("validateContentContract — 정상 계약", () => {
     expect(prompt).toContain("같은 진폭");
     expect(prompt).toContain("거리가 같");
   });
+
+  it("2차시 학생 문항은 레이더·안테나 세부 평가를 제외하고 RLC 공진에 집중한다", () => {
+    const content = lesson2 as unknown as LessonContent;
+    const studentQuestionText = content.questions
+      .flatMap((question) => [question.prompt, ...question.choices.map((choice) => choice.label)])
+      .join(" ");
+    const studentMissionText = content.missions
+      .flatMap((mission) => [
+        mission.title,
+        mission.arObservationText,
+        mission.predictionPrompt,
+        mission.controlLabel,
+        mission.verificationCaption,
+        ...mission.predictionChoices.map((choice) => choice.label),
+      ])
+      .join(" ");
+    expect(studentQuestionText).not.toMatch(/방사\s*속도|야기\s*안테나|주엽|대역폭|레이더/);
+    expect(studentMissionText).not.toMatch(/방사\s*속도|야기\s*안테나|주엽|대역폭/);
+    expect(content.questions).toHaveLength(4);
+    expect(content.questions.every((question) => question.concept.startsWith("rlc_"))).toBe(true);
+    expect(content.questions.map((question) => question.prompt).join(" ")).toContain("공진 주파수");
+  });
 });
 
 describe("validateContentContract — 위반 fixture는 반드시 실패한다", () => {

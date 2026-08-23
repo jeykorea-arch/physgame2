@@ -1,8 +1,8 @@
 {
   "lessonId": 2,
-  "contentVersion": "project-echo-v3-wavefront-2026-08-23",
+  "contentVersion": "project-echo-v4-rlc-focus-2026-08-23",
   "markerVersion": "project-echo-3-lessons-2026-08-22",
-  "storyIntro": "기록소가 반사 신호는 받았지만 목표의 거리·운동·방향·주파수를 뒤섞었다. M02를 스캔해 수신국을 복구하라.",
+  "storyIntro": "기록소의 레이더와 안테나에는 여러 전자기파 신호가 들어온다. 장치의 세부 원리는 교사 설명으로 넘기고, 수신 RLC 회로의 공진 주파수를 맞춰 필요한 신호를 선택하라.",
   "recallPrompts": [
     {
       "id": "L2-R01",
@@ -19,162 +19,166 @@
   "missions": [
     {
       "id": "L2-M1",
-      "title": "레이더 거리 복구",
-      "arObservationText": "짧은 펄스가 목표에 반사되어 돌아오는 모습을 관찰한다.",
-      "predictionPrompt": "왕복 시간 Δt가 2배로 늘어나면 계산되는 거리 R은 어떻게 될까?",
+      "title": "RLC 회로의 공진 조건",
+      "arObservationText": "레이더와 안테나가 받은 여러 전자기파 신호가 RLC 수신 회로로 들어오는 이야기 장면을 관찰한다.",
+      "predictionPrompt": "직렬 RLC 회로가 공진할 때 유도 리액턴스 X_L과 용량 리액턴스 X_C의 관계는?",
       "predictionChoices": [
-        { "id": "A", "label": "2배가 된다" },
-        { "id": "B", "label": "그대로다" },
-        { "id": "C", "label": "4배가 된다" }
+        { "id": "A", "label": "X_L = X_C" },
+        { "id": "B", "label": "X_L = 0" },
+        { "id": "C", "label": "X_C = 0" }
       ],
       "correctPredictionChoiceId": "A",
-      "controlLabel": "왕복 시간 Δt",
-      "controlMin": 0.5,
-      "controlMax": 5,
+      "controlLabel": "신호의 진동수 f",
+      "controlMin": 1.5,
+      "controlMax": 6.5,
       "controlStep": 0.1,
-      "controlDefault": 2,
-      "controlUnit": "μs",
-      "verificationCaption": "R = c·Δt/2. 측정한 시간은 왕복 시간이고, 화면의 R은 한쪽(편도) 거리다. Δt=2.00 μs이면 R=300 m.",
+      "controlDefault": 2.5,
+      "controlUnit": "MHz",
+      "verificationCaption": "L=10 μH, C=200 pF인 직렬 RLC 회로에서 f를 바꾸면 X_L=2πfL은 커지고 X_C=1/(2πfC)는 작아진다. 두 값이 같아지는 진동수가 공진 주파수 f₀이다.",
       "estimatedSeconds": 180
     },
     {
       "id": "L2-M2",
-      "title": "레이더 방사 속도",
-      "arObservationText": "반사파의 도플러 변화로 목표가 레이더에 가까워지는지 멀어지는지 관찰한다.",
-      "predictionPrompt": "목표가 레이더 빔과 수직으로만 움직이면 레이더가 측정하는 방사 속도는 어떻게 될까?",
+      "title": "L과 공진 주파수",
+      "arObservationText": "RLC 회로의 L과 C가 공진 주파수를 정한다. 먼저 C를 고정하고 L의 영향을 확인한다.",
+      "predictionPrompt": "정전용량 C가 같을 때 인덕턴스 L을 크게 하면 공진 주파수 f₀는 어떻게 될까?",
       "predictionChoices": [
-        { "id": "A", "label": "0에 가까워진다" },
-        { "id": "B", "label": "실제 속력과 같게 측정된다" },
-        { "id": "C", "label": "항상 최댓값으로 측정된다" }
+        { "id": "A", "label": "낮아진다" },
+        { "id": "B", "label": "높아진다" },
+        { "id": "C", "label": "변하지 않는다" }
       ],
       "correctPredictionChoiceId": "A",
-      "controlLabel": "목표의 빔 방향 성분 v_r (+: 접근, −: 후퇴)",
-      "controlMin": -60,
-      "controlMax": 60,
+      "controlLabel": "인덕턴스 L (C=200 pF 고정)",
+      "controlMin": 2,
+      "controlMax": 18,
       "controlStep": 2,
-      "controlDefault": 20,
-      "controlUnit": "m/s",
-      "verificationCaption": "레이더가 직접 측정하는 것은 빔 방향 성분인 방사 속도다. 이 화면은 접근을 +, 후퇴를 −로 정해 Δf=2v_r/λ로 표시한다. 실제 속력 전체와 항상 같지는 않다.",
+      "controlDefault": 4,
+      "controlUnit": "μH",
+      "verificationCaption": "f₀=1/(2π√LC). C가 같을 때 L을 크게 하면 분모의 √LC가 커지므로 공진 주파수는 낮아진다.",
       "estimatedSeconds": 180
     },
     {
       "id": "L2-M3",
-      "title": "야기 안테나와 LC 수신국",
-      "arObservationText": "안테나 방향과 수신 회로 주파수를 맞춰 수신국을 복구한다.",
-      "predictionPrompt": "안테나를 송신원 반대 방향(후방)으로 돌리면 수신 세기는 어떻게 될까?",
+      "title": "RLC 수신 회로 복구",
+      "arObservationText": "레이더나 안테나의 수신부에서도 필요한 전자기파 신호를 골라내는 회로가 쓰인다. 목표 신호에 공진 주파수를 맞춘다.",
+      "predictionPrompt": "인덕턴스 L이 같을 때 정전용량 C를 크게 하면 공진 주파수 f₀는 어떻게 될까?",
       "predictionChoices": [
-        { "id": "A", "label": "작아지지만 0은 아니다" },
-        { "id": "B", "label": "완전히 0이 된다" },
-        { "id": "C", "label": "정면과 같아진다" }
+        { "id": "A", "label": "낮아진다" },
+        { "id": "B", "label": "높아진다" },
+        { "id": "C", "label": "변하지 않는다" }
       ],
       "correctPredictionChoiceId": "A",
-      "controlLabel": "정전용량 C (L은 고정)",
+      "controlLabel": "정전용량 C (L=10 μH 고정)",
       "controlMin": 50,
       "controlMax": 400,
       "controlStep": 10,
       "controlDefault": 100,
       "controlUnit": "pF",
-      "verificationCaption": "야기 안테나는 주엽 방향 이득·감도가 크지만 후방 응답이 0이 되지 않는다. C를 약 200 pF로 맞추면 f0가 목표 3.559 MHz와 일치한다. 실제 선택 곡선은 한 점이 아닌 유한 폭의 봉우리다.",
-      "estimatedSeconds": 270
+      "verificationCaption": "C를 약 200 pF로 맞추면 f₀가 목표 3.559 MHz와 일치한다. 실제 RLC 회로에서는 저항 때문에 한 점만 반응하는 것이 아니라 공진 주파수 주변에서도 어느 정도 응답한다.",
+      "estimatedSeconds": 240
     }
   ],
   "questions": [
     {
       "id": "L2-Q01",
-      "concept": "radar_range",
-      "prompt": "레이더 신호의 왕복 시간이 2.00 μs일 때, 목표까지의 거리는?",
+      "concept": "rlc_resonance_condition",
+      "prompt": "직렬 RLC 회로가 공진할 때 유도 리액턴스 X_L과 용량 리액턴스 X_C의 관계로 옳은 것은?",
       "choices": [
-        { "id": "A", "label": "약 300 m" },
-        { "id": "B", "label": "약 600 m" },
-        { "id": "C", "label": "약 150 m" },
-        { "id": "D", "label": "약 1200 m" }
+        { "id": "A", "label": "X_L = X_C" },
+        { "id": "B", "label": "X_L = 0이고 X_C는 남는다" },
+        { "id": "C", "label": "X_C = 0이고 X_L은 남는다" },
+        { "id": "D", "label": "X_L과 X_C가 모두 무한대가 된다" }
       ],
       "correctChoiceId": "A",
-      "correctFeedback": "맞다. R=cΔt/2=(3×10^8×2.00×10^-6)/2=300 m.",
+      "correctFeedback": "맞다. 직렬 RLC 회로의 공진에서는 X_L=X_C가 되어 두 리액턴스의 효과가 서로 상쇄된다.",
       "incorrectFeedback": {
-        "B": "이 값은 1/2을 곱하지 않은 결과다. 왕복 시간이므로 반드시 2로 나눠야 편도 거리 R이 나온다.",
-        "C": "이 값은 Δt를 반으로 잘못 나눈 뒤 다시 나눈 값에 가깝다. R=cΔt/2를 다시 계산해보자.",
-        "D": "이 값은 실제보다 4배 크다. 왕복 시간에 1/2을 곱하는 것을 확인하자."
+        "A": "X_L=X_C가 직렬 RLC 회로의 공진 조건이다.",
+        "B": "공진은 X_L만 0이 되는 상태가 아니다. X_L과 X_C의 크기가 같아진다.",
+        "C": "공진은 X_C만 0이 되는 상태가 아니다. X_L과 X_C의 크기가 같아진다.",
+        "D": "공진에서는 두 리액턴스가 무한대가 되는 것이 아니라 X_L=X_C가 된다."
       },
-      "misconceptionTag": "radar_round_trip_half_factor",
-      "expectedSeconds": 75
+      "misconceptionTag": "rlc_resonance_condition",
+      "expectedSeconds": 45
     },
     {
       "id": "L2-Q02",
-      "concept": "range_vs_velocity",
-      "prompt": "레이더에서 거리와 목표의 운동(방사 속도)은 각각 어떤 관측량으로 알아내는가?",
+      "concept": "rlc_resonance_formula",
+      "prompt": "인덕턴스가 L, 정전용량이 C인 RLC 회로의 공진 주파수 f₀를 나타내는 식은?",
       "choices": [
-        { "id": "A", "label": "거리: 왕복 시간, 운동: 도플러 주파수 변화" },
-        { "id": "B", "label": "거리와 운동 모두 하나의 도플러 값으로 동시에 알아낸다" },
-        { "id": "C", "label": "거리: 도플러 변화, 운동: 왕복 시간" },
-        { "id": "D", "label": "거리와 운동 모두 신호 세기로 알아낸다" }
+        { "id": "A", "label": "f₀ = 1/(2π√LC)" },
+        { "id": "B", "label": "f₀ = 2π√LC" },
+        { "id": "C", "label": "f₀ = L/C" },
+        { "id": "D", "label": "f₀ = LC" }
       ],
       "correctChoiceId": "A",
-      "correctFeedback": "맞다. 거리는 펄스의 왕복 시간(R=cΔt/2)으로, 운동(방사 속도)은 반사파의 도플러 주파수 변화로 서로 다른 정보를 사용해 구한다.",
+      "correctFeedback": "맞다. X_L=X_C에서 정리하면 f₀=1/(2π√LC)를 얻는다.",
       "incorrectFeedback": {
-        "B": "하나의 값으로 거리와 속도를 동시에 얻을 수 없다. 거리는 왕복 시간, 속도는 도플러 변화로 각각 구한다.",
-        "C": "거리와 운동에 쓰이는 관측량이 뒤바뀌었다. 거리는 왕복 시간, 운동은 도플러 변화로 구한다.",
-        "D": "신호 세기는 거리·속도 계산에 직접 쓰이지 않는다. 거리는 왕복 시간, 속도는 도플러 변화를 사용한다."
+        "A": "X_L=X_C를 정리하면 f₀=1/(2π√LC)이다.",
+        "B": "2π√LC는 분모에 들어가야 한다. f₀=1/(2π√LC)이다.",
+        "C": "L/C는 공진 주파수 식이 아니다. X_L=X_C에서 식을 다시 정리해 보자.",
+        "D": "LC만 곱하면 주파수의 단위가 되지 않는다. 제곱근과 2π가 필요하다."
       },
-      "misconceptionTag": "range_velocity_conflation",
+      "misconceptionTag": "rlc_resonance_formula",
       "expectedSeconds": 60
     },
     {
       "id": "L2-Q03",
-      "concept": "yagi_directivity",
-      "prompt": "수신국 복구에서 야기 안테나의 방향을 돌리는 이유로 가장 정확한 것은?",
+      "concept": "rlc_resonance_scaling",
+      "prompt": "정전용량 C가 일정할 때 인덕턴스 L을 4배로 하면 공진 주파수 f₀는 어떻게 되는가?",
       "choices": [
-        { "id": "A", "label": "주엽 방향의 이득·감도를 목표(송신원) 쪽으로 맞추기 위해" },
-        { "id": "B", "label": "다른 방향에서 오는 신호를 완전히 차단하기 위해" },
-        { "id": "C", "label": "안테나가 송신 전용이라 방향을 맞춰야만 작동하기 때문에" },
-        { "id": "D", "label": "주파수를 바꾸기 위해" }
+        { "id": "A", "label": "1/2배가 된다" },
+        { "id": "B", "label": "2배가 된다" },
+        { "id": "C", "label": "1/4배가 된다" },
+        { "id": "D", "label": "변하지 않는다" }
       ],
       "correctChoiceId": "A",
-      "correctFeedback": "맞다. 야기 안테나는 특정 방향(주엽)의 이득과 감도가 크며, 방향을 맞추면 그 방향의 수신 세기가 커진다.",
+      "correctFeedback": "맞다. f₀는 1/√L에 비례하므로 L이 4배가 되면 f₀는 1/2배가 된다.",
       "incorrectFeedback": {
-        "B": "다른 방향 신호가 0이 되는 것은 아니다. 후방·측면 응답은 작지만 남아 있다.",
-        "C": "야기 안테나는 송신과 수신 모두 가능하다. 방향을 맞추는 것은 이득이 큰 방향을 목표에 맞추기 위해서다.",
-        "D": "안테나 방향은 이득의 방향성과 관련이 있고, 주파수 선택은 LC 회로가 담당한다."
+        "A": "f₀∝1/√L이므로 L이 4배가 되면 f₀는 1/2배가 된다.",
+        "B": "L이 커지면 공진 주파수는 높아지는 것이 아니라 낮아진다.",
+        "C": "L은 제곱근 안에 있으므로 4배 변화는 주파수를 1/4배가 아니라 1/2배로 만든다.",
+        "D": "L은 공진 주파수 식에 포함되므로 L이 바뀌면 f₀도 바뀐다."
       },
-      "misconceptionTag": "yagi_complete_blocking_misconception",
-      "expectedSeconds": 45
+      "misconceptionTag": "rlc_square_root_scaling",
+      "expectedSeconds": 60
     },
     {
       "id": "L2-Q04",
-      "concept": "lc_resonance",
-      "prompt": "인덕턴스 L을 고정하고 정전용량 C를 증가시키면 공명 주파수는 어떻게 되는가?",
+      "concept": "rlc_resonance_numeric",
+      "prompt": "L=10 μH, C=200 pF인 회로의 공진 주파수로 가장 가까운 것은?",
       "choices": [
-        { "id": "A", "label": "낮아진다" },
-        { "id": "B", "label": "높아진다" },
-        { "id": "C", "label": "변화가 없다" },
-        { "id": "D", "label": "무한대가 된다" }
+        { "id": "A", "label": "약 3.56 MHz" },
+        { "id": "B", "label": "약 35.6 MHz" },
+        { "id": "C", "label": "약 356 kHz" },
+        { "id": "D", "label": "약 0.356 Hz" }
       ],
       "correctChoiceId": "A",
-      "correctFeedback": "맞다. f0=1/(2π√LC)에서 C가 커지면 분모의 √LC가 커져 f0은 낮아진다.",
+      "correctFeedback": "맞다. f₀=1/(2π√LC)에 L=10×10⁻⁶ H, C=200×10⁻¹² F를 넣으면 약 3.56 MHz이다.",
       "incorrectFeedback": {
-        "B": "f0=1/(2π√LC)를 보면 C가 커질수록 분모가 커져 f0은 오히려 낮아진다.",
-        "C": "C는 공명 주파수 식의 분모 안에 있으므로 C를 바꾸면 f0도 반드시 바뀐다.",
-        "D": "C를 늘리면 f0은 작아지는 방향으로 변한다. 무한대가 되려면 반대로 L이나 C가 0에 가까워져야 한다."
+        "A": "단위를 H와 F로 바꿔 계산하면 약 3.56 MHz이다.",
+        "B": "μH와 pF의 지수를 확인하자. 계산값은 약 3.56 MHz이다.",
+        "C": "계산 결과의 Hz를 MHz로 바꾸는 과정에서 10배 차이가 났다. 약 3.56 MHz이다.",
+        "D": "μH와 pF를 기본 단위 H와 F로 바꾼 뒤 계산해야 한다. 약 3.56 MHz이다."
       },
-      "misconceptionTag": "lc_resonance_direction",
-      "expectedSeconds": 60
+      "misconceptionTag": "rlc_unit_conversion",
+      "expectedSeconds": 75
     }
   ],
-  "exitCheckPrompt": "레이더가 거리와 속도를 각각 어떤 신호 정보로 알아내는지 두 문장으로 구분하여 쓰시오.",
+  "exitCheckPrompt": "RLC 회로의 공진 조건과 공진 주파수 식을 각각 한 문장으로 설명한다.",
   "exitCheckQuestion": {
     "id": "L2-EXIT",
-    "prompt": "레이더가 거리와 속도(운동)를 알아내는 방법으로 가장 정확한 것은?",
+    "prompt": "정전용량 C를 크게 했을 때 RLC 회로의 공진 주파수 변화로 옳은 것은?",
     "correctChoiceId": "A",
     "choices": [
-      { "id": "A", "label": "거리는 왕복 시간, 속도는 도플러 주파수 변화로 알아낸다" },
-      { "id": "B", "label": "거리와 속도 모두 신호 세기 하나로 알아낸다" },
-      { "id": "C", "label": "거리는 도플러 변화, 속도는 왕복 시간으로 알아낸다" }
+      { "id": "A", "label": "낮아진다" },
+      { "id": "B", "label": "높아진다" },
+      { "id": "C", "label": "변하지 않는다" }
     ]
   },
   "teacherExplanationCards": [
-    { "title": "전자기파 공통성과 검출 차이", "body": "전파와 가시광선은 모두 전자기파이며 진공에서 같은 속력 c로 전파한다. 차이는 주파수·파장과 물질과의 상호작용·검출 방식이다.", "misconceptionTag": "em_wave_speed_misconception" },
-    { "title": "왕복 시간과 방사 속도 구분", "body": "거리는 R=cΔt/2(왕복 시간), 운동은 도플러 주파수 변화(방사 속도)로 구분해서 구한다.", "misconceptionTag": "range_velocity_conflation" },
-    { "title": "야기 주엽과 전후비", "body": "야기 안테나는 주엽 방향의 이득·감도가 크지만 후방 응답이 0이 되지는 않는다.", "misconceptionTag": "yagi_complete_blocking_misconception" },
-    { "title": "LC 공명과 유한 대역폭", "body": "이상적 공명 주파수는 f0=1/(2π√LC)이며, 실제 회로는 저항과 유한 대역폭 때문에 주변 주파수에도 어느 정도 응답한다.", "misconceptionTag": "lc_resonance_direction" }
+    { "title": "이야기 속 레이더와 안테나", "body": "레이더와 안테나는 전자기파를 보내고 받는 장치의 사용 사례로만 소개한다. 거리 측정, 운동 분석, 안테나 방향성의 상세 원리는 이번 학생 문제에서 평가하지 않는다.", "misconceptionTag": "application_story_only" },
+    { "title": "직렬 RLC 공진 조건", "body": "X_L=2πfL, X_C=1/(2πfC)이며 공진에서는 X_L=X_C가 된다. 이때 직렬 회로의 임피던스는 최소이고 전류 진폭은 최대가 된다.", "misconceptionTag": "rlc_resonance_condition" },
+    { "title": "공진 주파수", "body": "X_L=X_C를 정리하면 f₀=1/(2π√LC)이다. L이나 C를 크게 하면 공진 주파수는 낮아진다.", "misconceptionTag": "rlc_resonance_formula" },
+    { "title": "저항 R의 역할", "body": "이상적인 공진 주파수 식은 L과 C로 정해진다. 실제 RLC 회로에서는 R 때문에 공진 봉우리의 높이와 폭이 달라지므로 주변 주파수에도 어느 정도 응답한다.", "misconceptionTag": "rlc_finite_bandwidth" }
   ]
 }

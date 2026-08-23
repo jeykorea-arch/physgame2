@@ -67,7 +67,8 @@ export function MissionCard({ mission, computeReadout, extraControls, onComplete
           </div>
           <p>{mission.verificationCaption}</p>
           {mission.qualitativeModelNotice && <p className="qualitative-tag">{mission.qualitativeModelNotice}</p>}
-          <button onClick={onComplete}>증거 기록 완료</button>
+          {readout.completionReady === false && <p className="qualitative-tag">목표 조건을 찾으면 증거 기록을 완료할 수 있습니다.</p>}
+          <button disabled={readout.completionReady === false} onClick={onComplete}>증거 기록 완료</button>
         </>
       )}
     </div>

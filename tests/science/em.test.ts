@@ -1,66 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { lcResonanceFrequency, qualitativeYagiGain, radarRange, radarRadialSpeedFromShift } from "../../src/science/em";
+import { qualitativeSelectivityResponse, rlcResonanceFrequency } from "../../src/science/em";
 
-describe("radarRange — 회귀 시험 (docs/04)", () => {
-  it("SCI-L2-01: 왕복 시간 2.00 μs → 거리 300 m (유효숫자 3자리, 정밀 c=299,792,458 m/s 사용)", () => {
-    const result = radarRange(2.0e-6);
-    // 정밀한 c를 사용하므로 299.79...m가 나오며, 유효숫자 3자리에서 300 m와 일치한다.
-    expect(result.rangeMeters).toBeCloseTo(300, 0);
+describe("rlcResonanceFrequency — 2차시 RLC 공진", () => {
+  it("L=10 μH, C=200 pF이면 공진 주파수는 약 3.5588 MHz이다", () => {
+    const result = rlcResonanceFrequency(10e-6, 200e-12);
+    expect(result.resonanceFrequencyHz! / 1e6).toBeCloseTo(3.5588, 3);
   });
 
-  it("SCI-L2-02: 왕복 시간 0 → 거리 0", () => {
-    const result = radarRange(0);
-    expect(result.rangeMeters).toBe(0);
+  it("C가 같을 때 L을 4배로 하면 공진 주파수는 1/2배가 된다", () => {
+    const base = rlcResonanceFrequency(10e-6, 200e-12).resonanceFrequencyHz!;
+    const quadrupledL = rlcResonanceFrequency(40e-6, 200e-12).resonanceFrequencyHz!;
+    expect(quadrupledL).toBeCloseTo(base / 2, 6);
   });
 
-  it("음의 왕복 시간은 무효 처리한다", () => {
-    expect(radarRange(-1).inputValid).toBe(false);
-  });
-});
-
-describe("lcResonanceFrequency — 회귀 시험 (docs/04)", () => {
-  it("SCI-L2-03: L=10μH, C=100pF → 약 5.0329 MHz", () => {
-    const result = lcResonanceFrequency(10e-6, 100e-12);
-    expect(result.resonanceFrequencyHz! / 1e6).toBeCloseTo(5.0329, 3);
-  });
-
-  it("SCI-L2-04: L 고정, C를 4배로 하면 공명 주파수는 1/2배가 된다", () => {
-    const base = lcResonanceFrequency(10e-6, 100e-12).resonanceFrequencyHz!;
-    const quadrupledC = lcResonanceFrequency(10e-6, 400e-12).resonanceFrequencyHz!;
+  it("L이 같을 때 C를 4배로 하면 공진 주파수는 1/2배가 된다", () => {
+    const base = rlcResonanceFrequency(10e-6, 100e-12).resonanceFrequencyHz!;
+    const quadrupledC = rlcResonanceFrequency(10e-6, 400e-12).resonanceFrequencyHz!;
     expect(quadrupledC).toBeCloseTo(base / 2, 6);
   });
 
-  it("L 또는 C가 0 이하이면 무효 처리한다", () => {
-    expect(lcResonanceFrequency(0, 100e-12).inputValid).toBe(false);
-    expect(lcResonanceFrequency(10e-6, -1).inputValid).toBe(false);
+  it("L 또는 C가 0 이하이면 계산하지 않는다", () => {
+    expect(rlcResonanceFrequency(0, 100e-12).inputValid).toBe(false);
+    expect(rlcResonanceFrequency(10e-6, -1).inputValid).toBe(false);
   });
 });
 
-describe("radarRadialSpeedFromShift", () => {
-  it("목표 운동이 빔과 수직이면(도플러 편이 0) 방사 속도는 0이 될 수 있다", () => {
-    const result = radarRadialSpeedFromShift(0.03, 0);
-    expect(result.radialSpeedMs).toBe(0);
-  });
-
-  it("파장이 0 이하이면 무효 처리한다", () => {
-    expect(radarRadialSpeedFromShift(0, 100).inputValid).toBe(false);
-  });
-
-  it("도플러 편이의 부호를 보존해 접근(+)과 후퇴(−)를 구분한다", () => {
-    expect(radarRadialSpeedFromShift(0.03, 1200).radialSpeedMs).toBe(18);
-    expect(radarRadialSpeedFromShift(0.03, -1200).radialSpeedMs).toBe(-18);
-  });
-});
-
-describe("qualitativeYagiGain — SCI-ANT-01", () => {
-  it("후방 응답이 0이 되지 않는다", () => {
-    const backGain = qualitativeYagiGain(Math.PI);
-    expect(backGain).toBeGreaterThan(0);
-  });
-
-  it("정면 이득이 후방 이득보다 크다", () => {
-    const frontGain = qualitativeYagiGain(0);
-    const backGain = qualitativeYagiGain(Math.PI);
-    expect(frontGain).toBeGreaterThan(backGain);
+describe("RLC 공진 응답 정성 모형", () => {
+  it("공진 주파수에서 반응이 가장 크고 주변 주파수에서도 0이 아니다", () => {
+    const f0 = rlcResonanceFrequency(10e-6, 200e-12).resonanceFrequencyHz!;
+    expect(qualitativeSelectivityResponse(f0, f0)).toBe(1);
+    expect(qualitativeSelectivityResponse(f0 * 1.05, f0)).toBeGreaterThan(0);
+    expect(qualitativeSelectivityResponse(f0 * 1.05, f0)).toBeLessThan(1);
   });
 });

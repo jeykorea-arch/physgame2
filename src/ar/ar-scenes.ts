@@ -98,41 +98,58 @@ function createWaveScene(): LessonArScene {
 
 function createElectromagneticScene(): LessonArScene {
   const group = new THREE.Group();
-  const station = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.16), new THREE.MeshBasicMaterial({ color: 0x6fd3ff }));
-  station.position.set(-0.68, -0.08, 0.08);
-  const target = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.28, 4), new THREE.MeshBasicMaterial({ color: 0xff9d7a }));
-  target.rotation.z = Math.PI / 4;
-  target.position.set(0.68, 0.22, 0.08);
-  group.add(station, target);
+  const radarStoryIcon = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.24, 0.14), new THREE.MeshBasicMaterial({ color: 0x6fd3ff }));
+  radarStoryIcon.position.set(-0.72, 0.24, 0.08);
+  const antennaStoryIcon = line([new THREE.Vector3(-0.7, -0.42, 0.06), new THREE.Vector3(-0.7, -0.05, 0.06)], 0xf2f4fb);
+  const receiver = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.56, 0.12), new THREE.MeshBasicMaterial({ color: 0x29364f, transparent: true, opacity: 0.88 }));
+  receiver.position.set(0.48, -0.02, 0.05);
+  group.add(radarStoryIcon, antennaStoryIcon, receiver);
 
-  const beam = line([station.position.clone(), target.position.clone()], 0xffd166);
-  group.add(beam);
-  const pulse = new THREE.Mesh(new THREE.SphereGeometry(0.055, 16, 10), new THREE.MeshBasicMaterial({ color: 0xffd166 }));
-  group.add(pulse);
+  const signalPaths = [
+    line([radarStoryIcon.position.clone(), new THREE.Vector3(0.24, 0.12, 0.11)], 0xffd166),
+    line([new THREE.Vector3(-0.7, -0.2, 0.06), new THREE.Vector3(0.24, -0.12, 0.11)], 0x6fd3ff),
+  ];
+  group.add(...signalPaths);
 
-  const yagiBoom = line([new THREE.Vector3(-0.55, -0.45, 0.06), new THREE.Vector3(0.05, -0.18, 0.06)], 0xf2f4fb);
-  group.add(yagiBoom);
-  for (let i = 0; i < 5; i++) {
-    const x = -0.48 + i * 0.13;
-    group.add(line([new THREE.Vector3(x, -0.53 + i * 0.058, 0.06), new THREE.Vector3(x - 0.08, -0.20 + i * 0.058, 0.06)], 0xf2f4fb));
-  }
+  const pulses = signalPaths.map((_, index) => {
+    const pulse = new THREE.Mesh(
+      new THREE.SphereGeometry(0.045, 14, 8),
+      new THREE.MeshBasicMaterial({ color: index === 0 ? 0xffd166 : 0x6fd3ff })
+    );
+    group.add(pulse);
+    return pulse;
+  });
 
   const lcRing = new THREE.Mesh(
     new THREE.TorusGeometry(0.16, 0.025, 10, 40),
     new THREE.MeshBasicMaterial({ color: 0x7be08a })
   );
-  lcRing.position.set(0.55, -0.43, 0.05);
+  lcRing.position.set(0.48, -0.02, 0.14);
   group.add(lcRing);
+
+  const resonancePeak = line(
+    [
+      new THREE.Vector3(0.25, -0.44, 0.06),
+      new THREE.Vector3(0.38, -0.34, 0.06),
+      new THREE.Vector3(0.48, -0.12, 0.06),
+      new THREE.Vector3(0.58, -0.34, 0.06),
+      new THREE.Vector3(0.71, -0.44, 0.06),
+    ],
+    0x7be08a
+  );
+  group.add(resonancePeak);
 
   return {
     group,
     update(elapsedSeconds) {
-      const cycle = (elapsedSeconds * 0.42) % 2;
-      const t = cycle <= 1 ? cycle : 2 - cycle;
-      pulse.position.lerpVectors(station.position, target.position, t);
-      pulse.position.z = 0.16;
+      const t = (elapsedSeconds * 0.48) % 1;
+      pulses[0].position.lerpVectors(radarStoryIcon.position, new THREE.Vector3(0.24, 0.12, 0.11), t);
+      pulses[1].position.lerpVectors(new THREE.Vector3(-0.7, -0.2, 0.06), new THREE.Vector3(0.24, -0.12, 0.11), t);
+      pulses.forEach((pulse) => { pulse.position.z = 0.16; });
       lcRing.scale.setScalar(1 + 0.12 * Math.sin(elapsedSeconds * 5));
-      (beam.material as THREE.LineBasicMaterial).opacity = 0.55 + 0.35 * Math.sin(elapsedSeconds * 4) ** 2;
+      signalPaths.forEach((path, index) => {
+        (path.material as THREE.LineBasicMaterial).opacity = 0.5 + 0.35 * Math.sin(elapsedSeconds * 4 + index) ** 2;
+      });
     },
     dispose: () => disposeGroup(group),
   };

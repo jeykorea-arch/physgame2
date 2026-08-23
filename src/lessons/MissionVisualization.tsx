@@ -47,26 +47,36 @@ export function MissionVisualization({ mission, value }: { mission: MissionScree
   }
 
   if (mission.id === "L2-M1") {
-    const targetX = 80 + clamp01((value - mission.controlMin) / (mission.controlMax - mission.controlMin)) * 190;
+    const frequencyHz = value * 1e6;
+    const xl = 2 * Math.PI * frequencyHz * 10e-6;
+    const xc = 1 / (2 * Math.PI * frequencyHz * 200e-12);
+    const scale = Math.max(xl, xc, 1);
+    const xlHeight = 72 * (xl / scale);
+    const xcHeight = 72 * (xc / scale);
     return (
-      <svg className="mission-visual" viewBox="0 0 300 110" role="img" aria-label={`왕복 시간 ${value}마이크로초에 대응하는 목표 거리`}>
-        <rect x="18" y="38" width="32" height="28" rx="4" /><polygon points={`${targetX},30 ${targetX + 24},52 ${targetX},74`} />
-        <path d={`M52 43 H${targetX - 5}`} className="signal-out" /><path d={`M${targetX - 5} 63 H52`} className="signal-back" />
-        <text x="16" y="100">레이더</text><text x={Math.max(190, targetX - 8)} y="100">목표</text>
+      <svg className="mission-visual" viewBox="0 0 300 135" role="img" aria-label={`주파수 ${value}메가헤르츠에서 유도 리액턴스와 용량 리액턴스 비교`}>
+        <line x1="38" y1="102" x2="262" y2="102" className="visual-guide" />
+        <rect x="70" y={102 - xlHeight} width="54" height={xlHeight} rx="6" className="bright-fringe" />
+        <rect x="176" y={102 - xcHeight} width="54" height={xcHeight} rx="6" className="visual-target" />
+        <text x="79" y="124">X_L</text><text x="185" y="124">X_C</text>
+        <text x="66" y="16">공진 조건: X_L = X_C</text>
       </svg>
     );
   }
 
   if (mission.id === "L2-M2") {
-    const magnitude = Math.max(18, Math.abs(value) * 1.6);
-    const start = value >= 0 ? 245 : 55;
-    const end = value >= 0 ? 245 - magnitude : 55 + magnitude;
+    const f0 = 1 / (2 * Math.PI * Math.sqrt(value * 1e-6 * 200e-12)) / 1e6;
+    const markerX = 36 + clamp01((f0 - 2.5) / 5) * 228;
     return (
-      <svg className="mission-visual" viewBox="0 0 300 105" role="img" aria-label={`방사 속도 ${value}미터 매초, ${value > 0 ? "접근" : value < 0 ? "후퇴" : "정지"}`}>
-        <rect x="18" y="35" width="35" height="32" rx="4" /><circle cx="245" cy="51" r="14" className="visual-target" />
-        <line x1="55" y1="51" x2="228" y2="51" className="visual-guide" />
-        {value !== 0 && <path d={`M${start} 82 H${end}`} className="visual-arrow" />}
-        <text x="13" y="96">레이더</text><text x="215" y="96">{value > 0 ? "접근(+)" : value < 0 ? "후퇴(−)" : "방사 성분 0"}</text>
+      <svg className="mission-visual" viewBox="0 0 300 125" role="img" aria-label={`인덕턴스 ${value}마이크로헨리에서 공진 주파수 ${f0.toFixed(3)}메가헤르츠`}>
+        <path d="M30 40 h18 c10 0 10 20 20 20 s10 -20 20 -20 s10 20 20 20 s10 -20 20 -20 h18" className="visual-wave" />
+        <line x1="146" y1="40" x2="146" y2="72" className="visual-guide" />
+        <line x1="166" y1="40" x2="166" y2="72" className="visual-guide" />
+        <line x1="166" y1="56" x2="270" y2="56" className="visual-guide" />
+        <text x="54" y="26">L 조절</text><text x="138" y="88">C 고정</text>
+        <line x1="36" y1="105" x2="264" y2="105" className="visual-guide" />
+        <circle cx={markerX} cy="105" r="7" className="source-dot" />
+        <text x="34" y="120">2.5</text><text x="239" y="120">7.5 MHz</text>
       </svg>
     );
   }

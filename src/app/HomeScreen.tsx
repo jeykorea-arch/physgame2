@@ -9,7 +9,7 @@ interface HomeScreenProps {
 
 const LESSONS: { id: 1 | 2 | 3; title: string; subtitle: string }[] = [
   { id: 1, title: "1차시 — 파동의 흔적", subtitle: "단일 슬릿 회절, 움직이는 음원 도플러 효과" },
-  { id: 2, title: "2차시 — 전자기파의 선택", subtitle: "레이더 거리·방사 속도, 야기 안테나, LC 공명" },
+  { id: 2, title: "2차시 — 전자기파의 선택", subtitle: "레이더·안테나 이야기와 RLC 회로의 공진 주파수" },
   { id: 3, title: "3차시 — 양자의 증거", subtitle: "광전 효과, 전자 검출 누적, 불확정성, 확률 원자 모형" },
 ];
 

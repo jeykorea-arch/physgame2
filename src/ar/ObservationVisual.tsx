@@ -24,16 +24,19 @@ export function ObservationVisual({ targetIndex }: { targetIndex: number }) {
   if (targetIndex === 1) {
     return (
       <figure className="observation-visual">
-        <svg viewBox="0 0 320 180" role="img" aria-label="레이더 왕복 신호, 야기 안테나 주엽, 유한 폭 LC 공명 곡선">
+        <svg viewBox="0 0 320 206" role="img" aria-label="레이더와 안테나가 받은 전자기파 신호를 RLC 수신 회로가 공진 주파수로 선택하는 이야기 장면">
           <title>전자기파의 선택 관찰</title>
-          <rect x="18" y="28" width="34" height="30" rx="4" /><polygon points="260,20 286,43 260,66" />
-          <path d="M55 34 H246" className="signal-out" /><path d="M246 54 H55" className="signal-back" />
-          <text x="92" y="22">왕복 시간 → 거리</text>
-          <path d="M45 115 Q105 70 165 115 Q105 160 45 115" className="lobe" /><line x1="30" y1="115" x2="105" y2="115" />
-          <path d="M185 155 Q220 75 255 155" className="resonance" /><line x1="175" y1="155" x2="295" y2="155" />
-          <text x="22" y="174">야기 주엽</text><text x="190" y="174">유한 대역폭</text>
+          <rect x="14" y="24" width="34" height="28" rx="4" /><text x="9" y="68">레이더</text>
+          <line x1="80" y1="18" x2="80" y2="58" /><line x1="68" y1="28" x2="92" y2="28" /><line x1="64" y1="40" x2="96" y2="40" />
+          <text x="58" y="68">안테나</text>
+          {[0, 1, 2].map((i) => <path key={i} d={`M102 ${27 + i * 10} Q132 ${17 + i * 10} 158 ${27 + i * 10}`} className="wave-line" />)}
+          <rect x="166" y="14" width="138" height="68" rx="8" className="visual-guide" />
+          <text x="183" y="34">RLC 수신 회로</text><text x="181" y="56">f₀ = 1/(2π√LC)</text>
+          <path d="M178 148 Q220 82 262 148" className="resonance" /><line x1="154" y1="148" x2="300" y2="148" />
+          <line x1="220" y1="88" x2="220" y2="156" className="threshold-line" />
+          <text x="204" y="174">f₀</text><text x="128" y="198">원하는 신호에서 응답이 가장 큼</text>
         </svg>
-        <figcaption>거리 정보는 왕복 시간, 방사 속도는 부호 있는 도플러 편이로 구분한다. 방향 이득과 LC 공명은 서로 다른 선택 기능이다.</figcaption>
+        <figcaption>레이더와 안테나는 전자기파를 보내고 받는 사용 사례다. 학생 활동은 RLC 회로의 L과 C가 공진 주파수를 정하고 원하는 신호를 선택하는 원리에 집중한다.</figcaption>
       </figure>
     );
   }

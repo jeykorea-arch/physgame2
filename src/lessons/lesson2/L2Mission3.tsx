@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { ChoiceId, MissionScreenContent } from "../../content/types";
 import { Stepper } from "../../accessibility/Stepper";
 import { qualitativeSelectivityResponse } from "../../science/em";
-import { computeLcResonance, computeYagiGain, lcFrequencyHzForCapacitance, LESSON2_FIXED } from "./calculations";
+import { computeLcResonance, lcFrequencyHzForCapacitance, LESSON2_FIXED } from "./calculations";
 
 function LcResponsePlot({ capacitancePf }: { capacitancePf: number }) {
   const f0 = lcFrequencyHzForCapacitance(capacitancePf);
@@ -16,7 +16,7 @@ function LcResponsePlot({ capacitancePf }: { capacitancePf: number }) {
   const targetX = 12 + (((LESSON2_FIXED.targetFrequencyHz / 1e6) - 1.5) / 5) * 276;
   const path = samples.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
   return (
-    <svg viewBox="0 0 300 130" width="100%" role="img" aria-label="현재 LC 공명 곡선과 목표 수신 주파수">
+    <svg viewBox="0 0 300 130" width="100%" role="img" aria-label="현재 RLC 공진 곡선과 목표 수신 주파수">
       <line x1="12" y1="106" x2="288" y2="106" stroke="currentColor" />
       <line x1={targetX} y1="12" x2={targetX} y2="106" stroke="#ffd166" strokeDasharray="5 4" />
       <path d={path} fill="none" stroke="#6fd3ff" strokeWidth="4" />
@@ -27,14 +27,12 @@ function LcResponsePlot({ capacitancePf }: { capacitancePf: number }) {
   );
 }
 
-/** L2-M3는 "두 순차적 단일 조작"이다(content_contract.json). 안테나 방향 → LC 주파수 순서로 한 화면 한 조작을 지킨다. */
+/** 목표 신호에 RLC 수신 회로의 공진 주파수를 맞추는 2차시 최종 미션. */
 export function L2Mission3({ mission, onComplete }: { mission: MissionScreenContent; onComplete: () => void }) {
-  const [stage, setStage] = useState<"predict" | "yagi" | "lc">("predict");
+  const [stage, setStage] = useState<"predict" | "lc">("predict");
   const [predictionChoice, setPredictionChoice] = useState<ChoiceId | null>(null);
-  const [angleDeg, setAngleDeg] = useState(90);
   const [capacitancePf, setCapacitancePf] = useState(mission.controlDefault);
 
-  const yagiReadout = computeYagiGain(angleDeg);
   const lcReadout = computeLcResonance(capacitancePf);
 
   return (
@@ -58,28 +56,15 @@ export function L2Mission3({ mission, onComplete }: { mission: MissionScreenCont
               </button>
             ))}
           </div>
-          <button disabled={!predictionChoice} onClick={() => setStage("yagi")}>
-            다음: 안테나 방향 맞추기
+          <button disabled={!predictionChoice} onClick={() => setStage("lc")}>
+            다음: 공진 주파수 맞추기
           </button>
-        </>
-      )}
-
-      {stage === "yagi" && (
-        <>
-          <p>1단계: 야기 안테나 방향을 송신원 쪽으로 맞춘다. 0도가 정면(주엽)이다.</p>
-          <Stepper label="안테나 각도(정면 기준)" value={angleDeg} min={0} max={180} step={5} unit="도" onChange={setAngleDeg} />
-          <div className="feedback-box">
-            <strong>{yagiReadout.primaryLabel}: </strong>
-            {yagiReadout.primaryValue}
-            {yagiReadout.note && <p className="qualitative-tag">{yagiReadout.note}</p>}
-          </div>
-          <button onClick={() => setStage("lc")}>다음: 수신 주파수 맞추기</button>
         </>
       )}
 
       {stage === "lc" && (
         <>
-          <p>2단계: L은 고정되어 있다. 정전용량 C만 조절해 목표 주파수에 공명을 맞춘다.</p>
+          <p>L은 10 μH로 고정되어 있다. 정전용량 C만 조절해 목표 신호 3.559 MHz에 공진을 맞춘다.</p>
           <Stepper
             label={mission.controlLabel}
             value={capacitancePf}
@@ -96,7 +81,7 @@ export function L2Mission3({ mission, onComplete }: { mission: MissionScreenCont
           </div>
           <LcResponsePlot capacitancePf={capacitancePf} />
           <p>{mission.verificationCaption}</p>
-          {!lcReadout.completionReady && <p className="qualitative-tag">공명 봉우리를 목표 주파수에 맞춰 상대 응답 80% 이상을 만드세요.</p>}
+          {!lcReadout.completionReady && <p className="qualitative-tag">공진 봉우리를 목표 주파수에 맞춰 상대 응답 80% 이상을 만드세요.</p>}
           <button disabled={!lcReadout.completionReady} onClick={onComplete}>증거 기록 완료</button>
         </>
       )}

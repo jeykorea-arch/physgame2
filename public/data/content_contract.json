@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "content_version": "project-echo-v3-wavefront-2026-08-23",
+  "content_version": "project-echo-v4-rlc-focus-2026-08-23",
   "product": {
     "title": "PROJECT ECHO: 흔적 기록소",
     "subject": "고등학교 물리학 II",
@@ -27,7 +27,9 @@
   ],
   "excluded_from_main_game": [
     "렌즈 상 작도",
-    "교류 발생 역사 서사"
+    "교류 발생 역사 서사",
+    "레이더 거리·운동의 정량 계산",
+    "안테나 방향성의 정량·평가 문항"
   ],
   "science_invariants": [
     {
@@ -44,15 +46,15 @@
     },
     {
       "id": "SCI-RADAR-01",
-      "rule": "레이더 거리는 왕복 시간 R=cΔt/2, 운동은 도플러 변화와 방사 속도로 구분한다."
+      "rule": "레이더는 전자기파 송수신 장치의 이야기 배경으로만 제시하며 거리·운동 계산은 2차시 학생 활동이나 평가에 넣지 않는다."
     },
     {
       "id": "SCI-ANT-01",
-      "rule": "야기 안테나는 주엽 방향의 이득과 감도가 크지만 다른 방향 응답이 0이라고 표현하지 않는다."
+      "rule": "안테나는 전자기파 송수신 장치의 이야기 배경으로만 제시하며 특정 안테나의 방향성은 2차시 학생 활동이나 평가에 넣지 않는다."
     },
     {
       "id": "SCI-LC-01",
-      "rule": "이상적 LC 공명은 f0=1/(2π√LC)이며 실제 선택 곡선은 유한 대역폭을 가진다."
+      "rule": "직렬 RLC 공진은 X_L=X_C이며 이상적 공진 주파수는 f0=1/(2π√LC)이다. 실제 회로는 저항 때문에 유한한 폭의 공진 곡선을 가진다."
     },
     {
       "id": "SCI-EM-01",
@@ -155,67 +157,68 @@
       "missions": [
         {
           "id": "L2-M1",
-          "title": "레이더 거리",
-          "primary_control": "round_trip_time",
+          "title": "RLC 회로의 공진 조건",
+          "primary_control": "signal_frequency_f",
           "fixed_variables": [
-            "wave_speed_c"
+            "inductance_L",
+            "capacitance_C"
           ],
-          "model": "R=c*delta_t/2",
+          "model": "X_L=2*pi*f*L; X_C=1/(2*pi*f*C); resonance_when_X_L=X_C",
           "estimated_seconds": 180
         },
         {
           "id": "L2-M2",
-          "title": "레이더 방사 속도",
-          "primary_control": "target_radial_motion",
+          "title": "L과 공진 주파수",
+          "primary_control": "inductance_L",
           "fixed_variables": [
-            "radar_wavelength"
+            "capacitance_C"
           ],
-          "model": "abs(delta_f)=2*abs(v_r)/lambda",
+          "model": "f0=1/(2*pi*sqrt(L*C))",
           "estimated_seconds": 180
         },
         {
           "id": "L2-M3",
-          "title": "야기 안테나와 LC 수신국",
-          "primary_control": "two_sequential_single_controls",
+          "title": "RLC 수신 회로 복구",
+          "primary_control": "capacitance_C",
           "fixed_variables": [
-            "nonzero_back_response",
-            "inductance_L"
+            "inductance_L",
+            "target_frequency"
           ],
           "model": "f0=1/(2*pi*sqrt(L*C))",
-          "estimated_seconds": 270
+          "estimated_seconds": 240
         }
       ],
       "questions": [
         {
           "id": "L2-Q01",
-          "type": "numeric",
-          "concept": "radar_range",
-          "expected_seconds": 75
+          "type": "concept",
+          "concept": "rlc_resonance_condition",
+          "expected_seconds": 45
         },
         {
           "id": "L2-Q02",
-          "type": "classification",
-          "concept": "range_vs_velocity",
+          "type": "concept",
+          "concept": "rlc_resonance_formula",
           "expected_seconds": 60
         },
         {
           "id": "L2-Q03",
-          "type": "concept",
-          "concept": "yagi_directivity",
-          "expected_seconds": 45
+          "type": "direction",
+          "concept": "rlc_resonance_scaling",
+          "expected_seconds": 60
         },
         {
           "id": "L2-Q04",
-          "type": "direction",
-          "concept": "lc_resonance",
-          "expected_seconds": 60
+          "type": "numeric",
+          "concept": "rlc_resonance_numeric",
+          "expected_seconds": 75
         }
       ],
       "teacher_explanation_focus": [
-        "전자기파 공통성과 검출 차이",
-        "왕복 시간과 방사 속도 구분",
-        "야기 주엽과 전후비",
-        "LC 공명과 유한 대역폭"
+        "레이더·안테나는 전자기파 송수신 장치의 이야기 배경",
+        "직렬 RLC 공진 조건 X_L=X_C",
+        "f0=1/(2π√LC)와 L·C 변화 방향",
+        "저항 R과 유한한 공진 곡선"
       ]
     },
     {
