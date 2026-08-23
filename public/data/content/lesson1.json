@@ -1,6 +1,6 @@
 {
   "lessonId": 1,
-  "contentVersion": "project-echo-v4-rlc-focus-2026-08-23",
+  "contentVersion": "project-echo-v5-balanced-answers-2026-08-23",
   "markerVersion": "project-echo-3-lessons-2026-08-22",
   "storyIntro": "기록소의 음향·광학 센서가 '퍼짐'과 '진동수 변화'를 같은 현상으로 잘못 분류했다. M01을 스캔해 두 현상을 분리하고 흔적을 복원하라.",
   "recallPrompts": [

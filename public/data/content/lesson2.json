@@ -1,6 +1,6 @@
 {
   "lessonId": 2,
-  "contentVersion": "project-echo-v4-rlc-focus-2026-08-23",
+  "contentVersion": "project-echo-v5-balanced-answers-2026-08-23",
   "markerVersion": "project-echo-3-lessons-2026-08-22",
   "storyIntro": "기록소의 레이더와 안테나에는 여러 전자기파 신호가 들어온다. 장치의 세부 원리는 교사 설명으로 넘기고, 수신 RLC 회로의 공진 주파수를 맞춰 필요한 신호를 선택하라.",
   "recallPrompts": [
@@ -9,9 +9,9 @@
       "prompt": "전파와 가시광선의 관계로 가장 정확한 것은?",
       "correctChoiceId": "A",
       "choices": [
-        { "id": "A", "label": "둘 다 전자기파이며 진공에서 같은 속력 c로 전파한다. 주파수와 파장이 다르다" },
         { "id": "B", "label": "전파와 가시광선은 본질이 달라서 진공 속력도 다르다" },
         { "id": "C", "label": "가시광선만 전자기파이고 전파는 소리와 같은 파동이다" },
+        { "id": "A", "label": "둘 다 전자기파이며 진공에서 같은 속력 c로 전파한다. 주파수와 파장이 다르다" },
         { "id": "D", "label": "둘 다 매질이 있어야만 전파된다" }
       ]
     }
@@ -23,8 +23,8 @@
       "arObservationText": "레이더와 안테나가 받은 여러 전자기파 신호가 RLC 수신 회로로 들어오는 이야기 장면을 관찰한다.",
       "predictionPrompt": "직렬 RLC 회로가 공진할 때 유도 리액턴스 X_L과 용량 리액턴스 X_C의 관계는?",
       "predictionChoices": [
-        { "id": "A", "label": "X_L = X_C" },
         { "id": "B", "label": "X_L = 0" },
+        { "id": "A", "label": "X_L = X_C" },
         { "id": "C", "label": "X_C = 0" }
       ],
       "correctPredictionChoiceId": "A",
@@ -43,9 +43,9 @@
       "arObservationText": "RLC 회로의 L과 C가 공진 주파수를 정한다. 먼저 C를 고정하고 L의 영향을 확인한다.",
       "predictionPrompt": "정전용량 C가 같을 때 인덕턴스 L을 크게 하면 공진 주파수 f₀는 어떻게 될까?",
       "predictionChoices": [
-        { "id": "A", "label": "낮아진다" },
         { "id": "B", "label": "높아진다" },
-        { "id": "C", "label": "변하지 않는다" }
+        { "id": "C", "label": "변하지 않는다" },
+        { "id": "A", "label": "낮아진다" }
       ],
       "correctPredictionChoiceId": "A",
       "controlLabel": "인덕턴스 L (C=200 pF 고정)",
@@ -63,8 +63,8 @@
       "arObservationText": "레이더나 안테나의 수신부에서도 필요한 전자기파 신호를 골라내는 회로가 쓰인다. 목표 신호에 공진 주파수를 맞춘다.",
       "predictionPrompt": "인덕턴스 L이 같을 때 정전용량 C를 크게 하면 공진 주파수 f₀는 어떻게 될까?",
       "predictionChoices": [
-        { "id": "A", "label": "낮아진다" },
         { "id": "B", "label": "높아진다" },
+        { "id": "A", "label": "낮아진다" },
         { "id": "C", "label": "변하지 않는다" }
       ],
       "correctPredictionChoiceId": "A",
@@ -84,8 +84,8 @@
       "concept": "rlc_resonance_condition",
       "prompt": "직렬 RLC 회로가 공진할 때 유도 리액턴스 X_L과 용량 리액턴스 X_C의 관계로 옳은 것은?",
       "choices": [
-        { "id": "A", "label": "X_L = X_C" },
         { "id": "B", "label": "X_L = 0이고 X_C는 남는다" },
+        { "id": "A", "label": "X_L = X_C" },
         { "id": "C", "label": "X_C = 0이고 X_L은 남는다" },
         { "id": "D", "label": "X_L과 X_C가 모두 무한대가 된다" }
       ],
@@ -105,10 +105,10 @@
       "concept": "rlc_resonance_formula",
       "prompt": "인덕턴스가 L, 정전용량이 C인 RLC 회로의 공진 주파수 f₀를 나타내는 식은?",
       "choices": [
-        { "id": "A", "label": "f₀ = 1/(2π√LC)" },
         { "id": "B", "label": "f₀ = 2π√LC" },
         { "id": "C", "label": "f₀ = L/C" },
-        { "id": "D", "label": "f₀ = LC" }
+        { "id": "D", "label": "f₀ = LC" },
+        { "id": "A", "label": "f₀ = 1/(2π√LC)" }
       ],
       "correctChoiceId": "A",
       "correctFeedback": "맞다. X_L=X_C에서 정리하면 f₀=1/(2π√LC)를 얻는다.",
@@ -147,9 +147,9 @@
       "concept": "rlc_resonance_numeric",
       "prompt": "L=10 μH, C=200 pF인 회로의 공진 주파수로 가장 가까운 것은?",
       "choices": [
-        { "id": "A", "label": "약 3.56 MHz" },
-        { "id": "B", "label": "약 35.6 MHz" },
         { "id": "C", "label": "약 356 kHz" },
+        { "id": "B", "label": "약 35.6 MHz" },
+        { "id": "A", "label": "약 3.56 MHz" },
         { "id": "D", "label": "약 0.356 Hz" }
       ],
       "correctChoiceId": "A",
@@ -170,8 +170,8 @@
     "prompt": "정전용량 C를 크게 했을 때 RLC 회로의 공진 주파수 변화로 옳은 것은?",
     "correctChoiceId": "A",
     "choices": [
-      { "id": "A", "label": "낮아진다" },
       { "id": "B", "label": "높아진다" },
+      { "id": "A", "label": "낮아진다" },
       { "id": "C", "label": "변하지 않는다" }
     ]
   },

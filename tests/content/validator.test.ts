@@ -52,6 +52,14 @@ describe("validateContentContract — 정상 계약", () => {
     expect(content.questions.every((question) => question.concept.startsWith("rlc_"))).toBe(true);
     expect(content.questions.map((question) => question.prompt).join(" ")).toContain("공진 주파수");
   });
+
+  it("2차시 핵심 4문항의 정답 위치는 ①~④에 한 번씩 분산된다", () => {
+    const content = lesson2 as unknown as LessonContent;
+    const correctPositions = content.questions.map((question) =>
+      question.choices.findIndex((choice) => choice.id === question.correctChoiceId) + 1
+    );
+    expect(correctPositions.sort()).toEqual([1, 2, 3, 4]);
+  });
 });
 
 describe("validateContentContract — 위반 fixture는 반드시 실패한다", () => {
