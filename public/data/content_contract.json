@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "content_version": "project-echo-v5-balanced-answers-2026-08-23",
+  "content_version": "project-echo-v6-clear-rlc-questions-2026-08-23",
   "product": {
     "title": "PROJECT ECHO: 흔적 기록소",
     "subject": "고등학교 물리학 II",
@@ -209,9 +209,9 @@
         },
         {
           "id": "L2-Q04",
-          "type": "numeric",
-          "concept": "rlc_resonance_numeric",
-          "expected_seconds": 75
+          "type": "evidence",
+          "concept": "rlc_frequency_selection",
+          "expected_seconds": 60
         }
       ],
       "teacher_explanation_focus": [

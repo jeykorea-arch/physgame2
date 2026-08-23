@@ -1,6 +1,6 @@
 {
   "lessonId": 2,
-  "contentVersion": "project-echo-v5-balanced-answers-2026-08-23",
+  "contentVersion": "project-echo-v6-clear-rlc-questions-2026-08-23",
   "markerVersion": "project-echo-3-lessons-2026-08-22",
   "storyIntro": "기록소의 레이더와 안테나에는 여러 전자기파 신호가 들어온다. 장치의 세부 원리는 교사 설명으로 넘기고, 수신 RLC 회로의 공진 주파수를 맞춰 필요한 신호를 선택하라.",
   "recallPrompts": [
@@ -144,30 +144,30 @@
     },
     {
       "id": "L2-Q04",
-      "concept": "rlc_resonance_numeric",
-      "prompt": "L=10 μH, C=200 pF인 회로의 공진 주파수로 가장 가까운 것은?",
+      "concept": "rlc_frequency_selection",
+      "prompt": "여러 진동수의 신호가 RLC 수신 회로에 들어올 때, 공진 주파수와 회로의 응답에 대한 설명으로 가장 적절한 것은?",
       "choices": [
-        { "id": "C", "label": "약 356 kHz" },
-        { "id": "B", "label": "약 35.6 MHz" },
-        { "id": "A", "label": "약 3.56 MHz" },
-        { "id": "D", "label": "약 0.356 Hz" }
+        { "id": "C", "label": "공진 주파수와 멀어질수록 회로의 응답이 더 커진다" },
+        { "id": "B", "label": "저항이 있으면 회로는 모든 진동수의 신호에 똑같이 반응한다" },
+        { "id": "A", "label": "입력 신호의 진동수가 공진 주파수에 가까울수록 응답이 크고, 실제 회로는 그 주변에도 어느 정도 반응한다" },
+        { "id": "D", "label": "공진 주파수는 L과 C와 관계없이 입력 신호가 정한다" }
       ],
       "correctChoiceId": "A",
-      "correctFeedback": "맞다. f₀=1/(2π√LC)에 L=10×10⁻⁶ H, C=200×10⁻¹² F를 넣으면 약 3.56 MHz이다.",
+      "correctFeedback": "맞다. RLC 회로는 공진 주파수 부근에서 응답이 가장 크고, 실제 회로에서는 저항 R 때문에 주변 진동수에도 어느 정도 반응한다.",
       "incorrectFeedback": {
-        "A": "단위를 H와 F로 바꿔 계산하면 약 3.56 MHz이다.",
-        "B": "μH와 pF의 지수를 확인하자. 계산값은 약 3.56 MHz이다.",
-        "C": "계산 결과의 Hz를 MHz로 바꾸는 과정에서 10배 차이가 났다. 약 3.56 MHz이다.",
-        "D": "μH와 pF를 기본 단위 H와 F로 바꾼 뒤 계산해야 한다. 약 3.56 MHz이다."
+        "A": "공진 주파수에 가까운 신호에서 응답이 가장 크고, 실제 회로는 그 주변에도 어느 정도 반응한다.",
+        "B": "저항은 공진 곡선의 높이와 폭에 영향을 주지만 모든 진동수에 같은 응답을 만들지는 않는다.",
+        "C": "공진 주파수에서 멀어질수록 응답은 작아진다.",
+        "D": "공진 주파수는 회로의 L과 C에 의해 정해지고, 입력 신호는 그 주파수와 얼마나 가까운지에 따라 다르게 응답한다."
       },
-      "misconceptionTag": "rlc_unit_conversion",
-      "expectedSeconds": 75
+      "misconceptionTag": "rlc_frequency_selection",
+      "expectedSeconds": 60
     }
   ],
-  "exitCheckPrompt": "RLC 회로의 공진 조건과 공진 주파수 식을 각각 한 문장으로 설명한다.",
+  "exitCheckPrompt": "인덕턴스 L을 일정하게 유지할 때 정전용량 C를 증가시키면 공진 주파수 f₀가 어떻게 변하는지, 공진 주파수 식과 연결해 한 문장으로 설명한다.",
   "exitCheckQuestion": {
     "id": "L2-EXIT",
-    "prompt": "정전용량 C를 크게 했을 때 RLC 회로의 공진 주파수 변화로 옳은 것은?",
+    "prompt": "인덕턴스 L을 일정하게 유지하고 정전용량 C만 증가시키면, f₀=1/(2π√LC)에 따라 공진 주파수 f₀는 어떻게 변하는가?",
     "correctChoiceId": "A",
     "choices": [
       { "id": "B", "label": "높아진다" },

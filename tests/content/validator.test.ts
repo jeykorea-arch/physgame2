@@ -60,6 +60,23 @@ describe("validateContentContract — 정상 계약", () => {
     );
     expect(correctPositions.sort()).toEqual([1, 2, 3, 4]);
   });
+
+  it("2차시 마지막 핵심 문항은 단순 수치 계산이 아니라 실제 RLC 응답을 해석한다", () => {
+    const content = lesson2 as unknown as LessonContent;
+    const finalQuestion = content.questions.at(-1)!;
+    expect(finalQuestion.concept).toBe("rlc_frequency_selection");
+    expect(finalQuestion.prompt).not.toMatch(/L\s*=|C\s*=|계산|가장 가까운 값/);
+    expect(finalQuestion.choices.find((choice) => choice.id === finalQuestion.correctChoiceId)?.label).toContain(
+      "공진 주파수에 가까울수록"
+    );
+  });
+
+  it("2차시 출구 확인은 L 고정·C 증가 조건과 판단 식을 명시한다", () => {
+    const content = lesson2 as unknown as LessonContent;
+    expect(content.exitCheckQuestion.prompt).toContain("L을 일정하게 유지");
+    expect(content.exitCheckQuestion.prompt).toContain("C만 증가");
+    expect(content.exitCheckQuestion.prompt).toContain("f₀=1/(2π√LC)");
+  });
 });
 
 describe("validateContentContract — 위반 fixture는 반드시 실패한다", () => {
