@@ -10,4 +10,12 @@ describe("차시별 AR 장면", () => {
       expect(() => scene.dispose()).not.toThrow();
     });
   }
+
+  it("1차시 AR 도플러 장면은 진행 방향으로 압축된 원형 파면을 사용한다", () => {
+    const scene = createLessonArScene(0);
+    const wavefronts = scene.group.children.filter((child) => child.name.startsWith("doppler-wavefront-"));
+    expect(wavefronts).toHaveLength(4);
+    expect(scene.group.getObjectByName("doppler-observer")).toBeDefined();
+    scene.dispose();
+  });
 });

@@ -4,6 +4,7 @@ import { storageKey } from "../storage/keys";
 export interface RealtimeJoinState {
   classCode: string;
   alias: string;
+  lessonId: 1 | 2 | 3;
 }
 
 export function getRealtimeJoin(): RealtimeJoinState | null {

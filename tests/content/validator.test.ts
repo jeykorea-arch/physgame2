@@ -23,6 +23,13 @@ describe("validateContentContract — 정상 계약", () => {
       expect(validateLessonContent(typedContract, lesson as unknown as LessonContent)).toEqual([]);
     }
   });
+
+  it("1차시 첫 회상 문항은 상쇄 간섭이 성립하는 가정을 명시한다", () => {
+    const prompt = (lesson1 as unknown as LessonContent).recallPrompts[0].prompt;
+    expect(prompt).toContain("같은 진동수");
+    expect(prompt).toContain("같은 진폭");
+    expect(prompt).toContain("거리가 같");
+  });
 });
 
 describe("validateContentContract — 위반 fixture는 반드시 실패한다", () => {

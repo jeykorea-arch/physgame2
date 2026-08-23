@@ -65,4 +65,11 @@ describe("교사용 실시간 진행판", () => {
     expect(progressPercent(inQuestion)).toBe(70);
     expect(progressPercent(student({ phase: "complete" }))).toBe(100);
   });
+
+  it("닉네임만 등록한 학생은 시작 방식 선택 전으로 표시하고 비AR 인원에는 넣지 않는다", () => {
+    const waiting = student({ phase: "entry", mode: "non-ar", completedMissionCount: 0, currentMissionId: "" });
+    expect(progressLabel(waiting)).toBe("접속 · 시작 방식 선택 전");
+    expect(progressPercent(waiting)).toBe(5);
+    expect(summarizeRoster({ waiting }, 1, NOW).nonAr).toBe(0);
+  });
 });

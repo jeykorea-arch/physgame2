@@ -18,13 +18,30 @@ export function MissionVisualization({ mission, value }: { mission: MissionScree
   }
 
   if (mission.id === "L1-M2") {
-    const compression = 10 + (value / 100) * 13;
+    const sourceX = 155;
+    const sourceY = 58;
+    const sourceAdvance = clamp01(value / 100) * 10;
+    const waveRadiusStep = 18;
     return (
-      <svg className="mission-visual" viewBox="0 0 300 120" role="img" aria-label={`음원 속력 ${value}미터 매초에서 앞뒤 파면 간격 비교`}>
-        <circle cx="145" cy="55" r="12" className="visual-source" />
-        {[1, 2, 3, 4].map((i) => <line key={`front-${i}`} x1={155 + i * (25 - compression / 2)} y1="22" x2={155 + i * (25 - compression / 2)} y2="88" className="visual-wave" />)}
-        {[1, 2, 3].map((i) => <line key={`back-${i}`} x1={133 - i * (25 + compression / 2)} y1="22" x2={133 - i * (25 + compression / 2)} y2="88" className="visual-wave" />)}
-        <path d="M132 102 H160" className="visual-arrow" /><text x="90" y="116">뒤쪽 파장 큼</text><text x="178" y="116">앞쪽 파장 작음</text>
+      <svg className="mission-visual" viewBox="0 0 300 178" role="img" aria-label={`오른쪽 관찰자에게 초속 ${value}미터로 다가가는 음원의 원형 파면. 앞쪽 간격은 좁고 뒤쪽 간격은 넓다`}>
+        <title>움직이는 음원이 만든 원형 파면</title>
+        {[1, 2, 3, 4].map((i) => (
+          <circle
+            key={`wavefront-${i}`}
+            cx={sourceX - i * sourceAdvance}
+            cy={sourceY}
+            r={i * waveRadiusStep}
+            className="doppler-wavefront"
+          />
+        ))}
+        <circle cx={sourceX} cy={sourceY} r="11" className="visual-source" />
+        <circle cx="270" cy={sourceY} r="10" className="visual-target" />
+        <path d="M185 30 H222 M213 23 L222 30 L213 37" className="visual-arrow" />
+        <text x="129" y="19">움직이는 음원</text>
+        <text x="247" y="83">관찰자</text>
+        <text x="28" y="170">뒤쪽 파장 큼</text>
+        <text x="177" y="162">앞쪽 파장 작음</text>
+        <text x="177" y="175">→ 높은 진동수</text>
       </svg>
     );
   }

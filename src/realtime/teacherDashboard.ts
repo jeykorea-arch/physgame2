@@ -49,7 +49,7 @@ export function summarizeRoster(
     connected: online.length,
     active: online.filter((student) => student.phase !== "complete" && student.completedQuestionCount < 4).length,
     completed: completed.length,
-    nonAr: online.filter((student) => student.mode === "non-ar").length,
+    nonAr: online.filter((student) => student.phase !== "entry" && student.mode === "non-ar").length,
   };
 }
 
@@ -67,6 +67,7 @@ export function progressPercent(student: StudentRealtimeRecord): number {
 }
 
 export function progressLabel(student: StudentRealtimeRecord): string {
+  if (student.phase === "entry") return "접속 · 시작 방식 선택 전";
   const phase = PHASE_LABEL[student.phase] ?? student.phase;
   if (student.phase !== "game") return phase;
   const missionTotal = LESSON_LIVE_META[student.lessonId].missionTotal;

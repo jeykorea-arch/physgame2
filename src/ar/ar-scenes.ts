@@ -52,13 +52,26 @@ function createWaveScene(): LessonArScene {
     group.add(arc);
   }
 
-  group.add(line([new THREE.Vector3(-0.92, -0.62, 0.01), new THREE.Vector3(0.92, -0.62, 0.01)], 0x7be08a));
+  group.add(line([new THREE.Vector3(-0.92, -0.68, 0.01), new THREE.Vector3(0.92, -0.68, 0.01)], 0x7be08a));
   const dopplerSource = new THREE.Mesh(new THREE.SphereGeometry(0.045, 14, 8), new THREE.MeshBasicMaterial({ color: 0xffd166 }));
-  dopplerSource.position.set(0, -0.68, 0.07);
+  dopplerSource.position.set(0.25, -0.68, 0.07);
   group.add(dopplerSource);
-  for (const x of [0.16, 0.3, 0.43, 0.55, -0.2, -0.42, -0.66]) {
-    group.add(line([new THREE.Vector3(x, -0.78, 0.04), new THREE.Vector3(x, -0.58, 0.04)], 0x7be08a));
+  const dopplerWavefronts: THREE.Mesh[] = [];
+  for (let i = 1; i <= 4; i++) {
+    const radius = i * 0.13;
+    const wavefront = new THREE.Mesh(
+      new THREE.RingGeometry(radius - 0.008, radius + 0.008, 48),
+      new THREE.MeshBasicMaterial({ color: 0x7be08a, transparent: true, opacity: 0.78, side: THREE.DoubleSide })
+    );
+    wavefront.name = `doppler-wavefront-${i}`;
+    wavefront.position.set(0.25 - i * 0.08, -0.68, 0.04);
+    dopplerWavefronts.push(wavefront);
+    group.add(wavefront);
   }
+  const dopplerObserver = new THREE.Mesh(new THREE.SphereGeometry(0.055, 14, 8), new THREE.MeshBasicMaterial({ color: 0xff9d7a }));
+  dopplerObserver.name = "doppler-observer";
+  dopplerObserver.position.set(0.82, -0.68, 0.07);
+  group.add(dopplerObserver);
 
   return {
     group,
@@ -74,7 +87,10 @@ function createWaveScene(): LessonArScene {
         (arc.material as THREE.MeshBasicMaterial).opacity = Math.max(0.12, 0.9 - scale * 0.2);
       });
       source.scale.setScalar(1 + Math.sin(elapsedSeconds * 6) * 0.15);
-      dopplerSource.position.x = Math.sin(elapsedSeconds * 1.2) * 0.04;
+      dopplerSource.position.x = 0.25 + Math.sin(elapsedSeconds * 1.2) * 0.025;
+      dopplerWavefronts.forEach((wavefront, i) => {
+        (wavefront.material as THREE.MeshBasicMaterial).opacity = 0.58 + 0.22 * Math.sin(elapsedSeconds * 3 - i * 0.55) ** 2;
+      });
     },
     dispose: () => disposeGroup(group),
   };

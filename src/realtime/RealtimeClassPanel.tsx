@@ -61,7 +61,7 @@ export function RealtimeClassPanel({ lessonId }: RealtimeClassPanelProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [roster, setRoster] = useState<Record<string, StudentRealtimeRecord>>({});
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState("차시 QR을 바로 사용할 수 있습니다. 실시간 수업을 열면 접속·진행 현황도 표시됩니다.");
+  const [status, setStatus] = useState("실시간 수업을 연 뒤 학생용 QR을 제시하세요.");
   const [now, setNow] = useState(() => Date.now());
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
@@ -108,6 +108,10 @@ export function RealtimeClassPanel({ lessonId }: RealtimeClassPanelProps) {
   }, [available, classCode, lessonId, liveOpen]);
 
   useEffect(() => {
+    if (available && (!liveOpen || !classCode)) {
+      setQrDataUrl(null);
+      return;
+    }
     let cancelled = false;
     import("qrcode")
       .then((QRCode) => QRCode.toDataURL(entryUrl, { width: 320, margin: 2, color: { dark: "#07141d", light: "#ffffff" } }))
@@ -120,7 +124,7 @@ export function RealtimeClassPanel({ lessonId }: RealtimeClassPanelProps) {
     return () => {
       cancelled = true;
     };
-  }, [entryUrl]);
+  }, [available, classCode, entryUrl, liveOpen]);
 
   if (!available) {
     return (
@@ -220,18 +224,15 @@ export function RealtimeClassPanel({ lessonId }: RealtimeClassPanelProps) {
 
       {!liveOpen ? (
         <div className="realtime-entry-grid">
-          <LessonQrCard
-            lessonId={lessonId}
-            url={entryUrl}
-            qrDataUrl={qrDataUrl}
-            tracked={false}
-            onCopy={copyJoinUrl}
-          />
+          <div className="qr-locked" aria-label="실시간 수업을 열기 전에는 학생용 QR이 표시되지 않습니다">
+            <span aria-hidden="true">QR</span>
+            <strong>실시간 수업을 열면<br />학생용 QR이 나타납니다.</strong>
+          </div>
           <div className="realtime-closed">
             <div>
-              <h3>학생용 QR은 이미 준비되었습니다</h3>
-              <p>학생은 왼쪽 QR을 찍어 {lessonId}차시에 바로 들어갈 수 있습니다.</p>
-              <p>접속 인원과 진행 상황까지 보려면 실시간 수업을 여세요. 개설되면 QR이 추적용 주소로 자동 전환됩니다.</p>
+              <h3>먼저 실시간 수업을 여세요</h3>
+              <p>수업을 열면 닉네임 입력과 교사용 진행판이 연결된 {lessonId}차시 전용 QR이 생성됩니다.</p>
+              <p>일반 QR과 추적용 QR을 혼동하지 않도록, 수업을 열기 전에는 학생용 QR을 표시하지 않습니다.</p>
               {classCode && <p>이전 수업 코드 <strong>{classCode}</strong>를 다시 사용할 수 있습니다.</p>}
               <button disabled={busy} onClick={openClassNow}>{busy ? "연결 중…" : classCode ? "이전 코드로 수업 열기" : "실시간 수업 열기"}</button>
             </div>
@@ -271,7 +272,7 @@ export function RealtimeClassPanel({ lessonId }: RealtimeClassPanelProps) {
                   <b>{student.alias}<small> #{uid.slice(-4).toUpperCase()}</small></b>
                   <span>{progressLabel(student)}</span>
                   <span className="student-progress-meter"><i style={{ width: `${percent}%` }} /><em>{percent}%</em></span>
-                  <span>{student.mode === "ar" ? "AR" : "비AR"}</span>
+                  <span>{student.phase === "entry" ? "선택 전" : student.mode === "ar" ? "AR" : "비AR"}</span>
                   <strong>{online ? "접속 중" : "연결 끊김"}</strong>
                 </div>
               );

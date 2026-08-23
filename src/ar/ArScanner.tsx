@@ -12,8 +12,29 @@ interface ArScannerProps {
   onObserved: () => void;
 }
 
+export function MarkerRecognitionOverlay({ recognized }: { recognized: boolean }) {
+  return (
+    <>
+      <div className="ar-tracking-frame" aria-hidden="true">
+        <i /><i /><i /><i />
+      </div>
+      {recognized && (
+        <div className="ar-recognition-status" role="status" aria-live="polite">
+          <span className="ar-recognition-check" aria-hidden="true">✓</span>
+          <span>
+            <strong>마커 인식됨</strong>
+            <small>마커를 화면 안에 유지하세요</small>
+          </span>
+        </div>
+      )}
+    </>
+  );
+}
+
 export function ArScanner({ targetIndex, targetsMindUrl, arObservationText, onTechEvent, onFallback, onObserved }: ArScannerProps) {
   const { containerRef, state, start, stop } = useArController({ targetIndex, targetsMindUrl, onTechEvent });
+  const cameraVisible = ["searching", "slow-search", "fallback-suggested", "found"].includes(state);
+  const markerRecognized = state === "found";
 
   useEffect(() => stop, [stop]);
 
@@ -53,17 +74,14 @@ export function ArScanner({ targetIndex, targetsMindUrl, arObservationText, onTe
         일어나지 않는 문제가 있었다. 렌더링은 항상 하고 필요 없을 때만 CSS로 숨긴다.
       */}
       <div
-        ref={containerRef}
+        className={`ar-camera-shell${markerRecognized ? " is-recognized" : ""}`}
         style={{
-          position: "relative",
-          width: "100%",
-          height: 280,
-          borderRadius: 12,
-          overflow: "hidden",
-          background: "#000",
-          display: ["searching", "slow-search", "fallback-suggested", "found"].includes(state) ? "block" : "none",
+          display: cameraVisible ? "block" : "none",
         }}
-      />
+      >
+        <div ref={containerRef} className="ar-camera-surface" />
+        <MarkerRecognitionOverlay recognized={markerRecognized} />
+      </div>
 
       {state === "searching" && <p>마커를 화면 중앙에 30~50cm 거리에서 비춰주세요.</p>}
       {state === "slow-search" && <p>10초 동안 인식되지 않았습니다. 거리·밝기·마커 반사를 확인해보세요.</p>}

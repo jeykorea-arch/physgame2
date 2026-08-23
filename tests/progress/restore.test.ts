@@ -1,12 +1,24 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import lesson1 from "../../public/data/content/lesson1.json";
 import type { LessonContent } from "../../src/content/types";
 import { deriveGameRestoreState } from "../../src/lessons/game-progress";
-import { createInitialProgress } from "../../src/storage/progress";
+import {
+  clearLessonProgress,
+  createInitialProgress,
+  loadAnswers,
+  loadProgress,
+  loadTechEvents,
+  recordTechEvent,
+  saveAnswer,
+  saveExitCheckChoice,
+  saveProgress,
+} from "../../src/storage/progress";
 
 const content = lesson1 as unknown as LessonContent;
 
 describe("게임 진행 복원", () => {
+  beforeEach(() => localStorage.clear());
+
   it("완료한 첫 미션 뒤에는 두 번째 미션으로 복원한다", () => {
     const progress = {
       ...createInitialProgress(1, "non-ar"),
@@ -42,5 +54,21 @@ describe("게임 진행 복원", () => {
   it("관찰 중 저장한 기록은 관찰 단계에 머문다", () => {
     const progress = { ...createInitialProgress(1, "ar"), phase: "game" as const, gameStage: "observe" as const };
     expect(deriveGameRestoreState(content, progress, []).stage).toBe("observe");
+  });
+
+  it("처음부터 다시 시작하면 현재 차시의 진행·답안·기술 기록·출구 결과를 모두 지운다", () => {
+    saveProgress({ ...createInitialProgress(1, "ar"), phase: "game", completedMissionIds: ["L1-M1"] });
+    saveAnswer(1, { questionId: "L1-Q01", responseCode: "A", correct: true, attempt: 1, score: 10, elapsedSeconds: 20 });
+    recordTechEvent(1, "fallbackSelected");
+    saveExitCheckChoice(1, true);
+    saveProgress({ ...createInitialProgress(2, "non-ar"), phase: "recall" });
+
+    clearLessonProgress(1);
+
+    expect(loadProgress(1)).toBeNull();
+    expect(loadAnswers(1)).toEqual([]);
+    expect(loadTechEvents(1)).toEqual([]);
+    expect(localStorage.getItem("physgame2.project-echo.exitCheck.lesson1")).toBeNull();
+    expect(loadProgress(2)?.phase).toBe("recall");
   });
 });

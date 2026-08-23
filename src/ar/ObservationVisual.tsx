@@ -2,7 +2,7 @@ export function ObservationVisual({ targetIndex }: { targetIndex: number }) {
   if (targetIndex === 0) {
     return (
       <figure className="observation-visual">
-        <svg viewBox="0 0 320 220" role="img" aria-label="슬릿 뒤 회절과 움직이는 음원 앞뒤 파면 간격 비교">
+        <svg viewBox="0 0 320 332" role="img" aria-label="슬릿 뒤 회절과 오른쪽 관찰자에게 다가가는 음원이 만든 원형 파면 비교">
           <title>파동의 흔적 관찰</title>
           <rect x="150" y="10" width="8" height="60" rx="3" />
           <rect x="150" y="100" width="8" height="60" rx="3" />
@@ -10,10 +10,12 @@ export function ObservationVisual({ targetIndex }: { targetIndex: number }) {
           {[35, 62, 90].map((r) => <path key={r} d={`M158 ${85 - r} A${r} ${r} 0 0 1 158 ${85 + r}`} className="wave-line" />)}
           <circle cx="82" cy="85" r="7" className="source-dot" />
           <text x="18" y="160">입사 파면</text><text x="205" y="160">좁은 틈 뒤 회절</text>
-          <circle cx="152" cy="190" r="7" className="source-dot" />
-          {[180, 197, 214, 231, 248].map((x) => <line key={`front-${x}`} x1={x} y1="174" x2={x} y2="207" className="wave-line" />)}
-          {[120, 92, 64, 36].map((x) => <line key={`back-${x}`} x1={x} y1="174" x2={x} y2="207" className="wave-line" />)}
-          <text x="72" y="218">뒤쪽 파장 큼</text><text x="190" y="218">앞쪽 파장 작음</text>
+          {[1, 2, 3, 4].map((i) => <circle key={`doppler-${i}`} cx={155 - i * 7} cy="218" r={i * 18} className="wave-line" />)}
+          <circle cx="155" cy="218" r="7" className="source-dot" />
+          <circle cx="286" cy="218" r="8" className="visual-target" />
+          <text x="166" y="192" className="doppler-motion-label">이동 →</text>
+          <text x="12" y="326" className="doppler-label">뒤쪽: 긴 파장</text>
+          <text x="170" y="316" className="doppler-label">앞쪽: 짧은 파장</text><text x="170" y="330" className="doppler-label">→ 높은 진동수</text>
         </svg>
         <figcaption>정성 모형: 슬릿 폭이 좁아질수록 회절각이 커진다. 도플러 활동에서는 음원 앞쪽 파면 간격이 더 좁다.</figcaption>
       </figure>

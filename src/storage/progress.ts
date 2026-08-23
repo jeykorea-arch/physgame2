@@ -53,6 +53,14 @@ export function loadProgress(lessonId: 1 | 2 | 3): ProgressRecord | null {
   return readJson<ProgressRecord>(storageKey.progress(lessonId));
 }
 
+/** 현재 차시만 처음부터 다시 시작한다. 익명 세션과 실시간 수업 별칭은 유지한다. */
+export function clearLessonProgress(lessonId: 1 | 2 | 3): void {
+  localStorage.removeItem(storageKey.progress(lessonId));
+  localStorage.removeItem(storageKey.answers(lessonId));
+  localStorage.removeItem(storageKey.techEvents(lessonId));
+  localStorage.removeItem(storageKey.exitCheck(lessonId));
+}
+
 export function saveProgress(progress: ProgressRecord): void {
   writeJson(storageKey.progress(progress.lessonId), { ...progress, updatedAt: new Date().toISOString() });
 }

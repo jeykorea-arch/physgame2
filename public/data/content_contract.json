@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "content_version": "project-echo-v2-corrected-2026-08-22",
+  "content_version": "project-echo-v3-wavefront-2026-08-23",
   "product": {
     "title": "PROJECT ECHO: 흔적 기록소",
     "subject": "고등학교 물리학 II",
@@ -32,7 +32,7 @@
   "science_invariants": [
     {
       "id": "SCI-NC-01",
-      "rule": "노이즈 캔슬링은 특정 위치와 주파수 범위에서 압력 진폭을 줄이는 간섭으로 표현하며 에너지가 사라진다고 하지 않는다."
+      "rule": "노이즈 캔슬링은 같은 진동수의 소리가 관찰점에 반대 위상으로 도달하는 조건에서 압력 진폭을 줄이는 간섭으로 표현하며, 특정 위치와 주파수 범위 밖의 에너지가 사라진다고 하지 않는다."
     },
     {
       "id": "SCI-WAVE-01",

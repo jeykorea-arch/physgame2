@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { ContentContract, LessonContent } from "../content/types";
 import { loadContentContract, loadLessonContent } from "../content/loader";
 import type { LessonMode, LessonPhase } from "../storage/models";
-import { createInitialProgress, getOrCreateSession, loadAnswers, loadProgress, saveProgress } from "../storage/progress";
+import { clearLessonProgress, createInitialProgress, getOrCreateSession, loadAnswers, loadProgress, saveProgress } from "../storage/progress";
 import { EntryScreen } from "./EntryScreen";
 import { RecallScreen } from "./RecallScreen";
 import { GameScreen } from "./GameScreen";
@@ -40,11 +40,14 @@ export function LessonScreen({ lessonId, joinClassCode, onGoHome }: LessonScreen
   const [phase, setPhase] = useState<LessonPhase>("entry");
   const [mode, setMode] = useState<LessonMode>("non-ar");
 
-  const alreadyJoined = joinClassCode ? getRealtimeJoin()?.classCode === joinClassCode : true;
+  const savedRealtimeJoin = getRealtimeJoin();
+  const alreadyJoined = joinClassCode
+    ? savedRealtimeJoin?.classCode === joinClassCode && savedRealtimeJoin.lessonId === lessonId
+    : true;
   const [needsAliasPrompt, setNeedsAliasPrompt] = useState(!!joinClassCode && isRealtimeAvailable() && !alreadyJoined);
-  const [pendingAlias, setPendingAlias] = useState<string | null>(null);
+  const [joinedThisVisit, setJoinedThisVisit] = useState(false);
 
-  const activeClassCode = joinClassCode && (alreadyJoined || pendingAlias) ? joinClassCode : null;
+  const activeClassCode = joinClassCode && (alreadyJoined || joinedThisVisit) ? joinClassCode : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -64,7 +67,12 @@ export function LessonScreen({ lessonId, joinClassCode, onGoHome }: LessonScreen
         }
 
         const savedJoin = getRealtimeJoin();
-        if (joinClassCode && isRealtimeAvailable() && savedJoin?.classCode === joinClassCode) {
+        if (
+          joinClassCode
+          && isRealtimeAvailable()
+          && savedJoin?.classCode === joinClassCode
+          && savedJoin.lessonId === lessonId
+        ) {
           const restoredMode = existing?.mode ?? "non-ar";
           import("../realtime/classSession")
             .then(({ joinClass }) =>
@@ -87,8 +95,13 @@ export function LessonScreen({ lessonId, joinClassCode, onGoHome }: LessonScreen
     return (
       <RealtimeJoinScreen
         classCode={joinClassCode}
-        onJoin={(alias) => {
-          setPendingAlias(alias);
+        initialAlias={savedRealtimeJoin?.classCode === joinClassCode ? savedRealtimeJoin.alias : ""}
+        onJoin={async (alias) => {
+          const restoredMode = loadProgress(lessonId)?.mode ?? "non-ar";
+          const { joinClass } = await import("../realtime/classSession");
+          await joinClass(joinClassCode, alias, lessonId, restoredMode, realtimeResumeState(lessonId, restoredMode));
+          setRealtimeJoin({ classCode: joinClassCode, alias, lessonId });
+          setJoinedThisVisit(true);
           setNeedsAliasPrompt(false);
         }}
         onSkip={() => setNeedsAliasPrompt(false)}
@@ -139,6 +152,31 @@ export function LessonScreen({ lessonId, joinClassCode, onGoHome }: LessonScreen
     }
   }
 
+  function restartCurrentLesson() {
+    const confirmed = window.confirm(
+      `현재 ${lessonId}차시의 진행과 답안을 모두 지우고 처음 화면으로 돌아갈까요? 수업용 닉네임과 교사용 화면 연결은 유지됩니다.`,
+    );
+    if (!confirmed) return;
+
+    clearLessonProgress(lessonId);
+    setMode("non-ar");
+    setPhase("entry");
+
+    if (activeClassCode) {
+      import("../realtime/classSession")
+        .then(({ resetStudentProgress }) => resetStudentProgress(activeClassCode, "non-ar"))
+        .catch(() => {
+          // 네트워크가 끊겨도 학생의 로컬 초기화와 학습 재시작은 막지 않는다.
+        });
+    }
+  }
+
+  const restartControl = phase !== "entry" && (
+    <div className="student-restart-bar">
+      <button className="secondary" onClick={restartCurrentLesson}>↺ 처음부터 다시 시작</button>
+    </div>
+  );
+
   switch (phase) {
     case "entry":
       return (
@@ -147,40 +185,33 @@ export function LessonScreen({ lessonId, joinClassCode, onGoHome }: LessonScreen
           storyIntro={lessonContent.storyIntro}
           onChooseMode={async (m) => {
             setMode(m);
-            if (joinClassCode && pendingAlias) {
-              try {
-                const { joinClass } = await import("../realtime/classSession");
-                await joinClass(joinClassCode, pendingAlias, lessonId, m, realtimeResumeState(lessonId, m));
-                setRealtimeJoin({ classCode: joinClassCode, alias: pendingAlias });
-              } catch (joinError) {
-                setError(joinError instanceof Error ? joinError.message : "실시간 수업 참가에 실패했습니다.");
-                return;
-              }
-            }
             goPhase("recall", m);
           }}
         />
       );
     case "recall":
-      return <RecallScreen lessonContent={lessonContent} onDone={() => goPhase("game")} />;
+      return <>{restartControl}<RecallScreen lessonContent={lessonContent} onDone={() => goPhase("game")} /></>;
     case "game":
       return (
-        <GameScreen
-          lessonMeta={lessonMeta}
-          lessonContent={lessonContent}
-          mode={mode}
-          initialProgress={loadProgress(lessonId)}
-          initialAnswers={loadAnswers(lessonId)}
-          realtimeClassCode={activeClassCode}
-          onGameComplete={() => goPhase("explanation")}
-        />
+        <>
+          {restartControl}
+          <GameScreen
+            lessonMeta={lessonMeta}
+            lessonContent={lessonContent}
+            mode={mode}
+            initialProgress={loadProgress(lessonId)}
+            initialAnswers={loadAnswers(lessonId)}
+            realtimeClassCode={activeClassCode}
+            onGameComplete={() => goPhase("explanation")}
+          />
+        </>
       );
     case "explanation":
-      return <ExplanationScreen lessonContent={lessonContent} onDone={() => goPhase("exit")} />;
+      return <>{restartControl}<ExplanationScreen lessonContent={lessonContent} onDone={() => goPhase("exit")} /></>;
     case "exit":
-      return <ExitCheckScreen lessonId={lessonId} lessonContent={lessonContent} onDone={() => goPhase("complete")} />;
+      return <>{restartControl}<ExitCheckScreen lessonId={lessonId} lessonContent={lessonContent} onDone={() => goPhase("complete")} /></>;
     case "complete":
-      return <SaveScreen lessonId={lessonId} onGoHome={onGoHome} />;
+      return <>{restartControl}<SaveScreen lessonId={lessonId} onGoHome={onGoHome} /></>;
     default:
       return null;
   }

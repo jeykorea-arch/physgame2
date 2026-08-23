@@ -139,6 +139,25 @@ export async function updateStudentProgress(
   });
 }
 
+/** 학생이 현재 차시를 처음부터 다시 시작할 때 교사용 진행판 기록도 같은 상태로 되돌린다. */
+export async function resetStudentProgress(classCodeInput: string, mode: "ar" | "non-ar"): Promise<void> {
+  const classCode = normalizeClassCode(classCodeInput);
+  const { auth, db } = await getFirebase();
+  const { ref, update } = await import("firebase/database");
+  await update(ref(db, `projectEchoClasses/${classCode}/students/${auth.currentUser!.uid}`), {
+    phase: "entry",
+    mode,
+    gameStage: "observe",
+    completedMissionCount: 0,
+    currentMissionId: "",
+    completedQuestionCount: 0,
+    score: 0,
+    answers: null,
+    connected: true,
+    lastSeenAt: Date.now(),
+  });
+}
+
 export async function recordStudentAnswer(classCodeInput: string, questionId: string, answer: StudentAnswerRecord): Promise<void> {
   const classCode = normalizeClassCode(classCodeInput);
   const { auth, db } = await getFirebase();

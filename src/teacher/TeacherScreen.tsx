@@ -88,7 +88,7 @@ export function TeacherScreen({ onGoHome }: { onGoHome: () => void }) {
         <div>
           <span className="teacher-eyebrow">PROJECT ECHO · TEACHER CONSOLE</span>
           <h1>교사용 수업 화면</h1>
-          <p>차시 선택 → QR 제시 → 학생 바로 접속 · 필요 시 실시간 진행 확인</p>
+          <p>차시 선택 → 실시간 수업 열기 → QR 제시 → 닉네임별 진행 확인</p>
         </div>
         <button className="secondary" onClick={onGoHome}>
           학생 화면으로

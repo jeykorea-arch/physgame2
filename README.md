@@ -7,7 +7,8 @@
 - 학생: 위 주소에서 차시를 선택하거나 `?lesson=1`, `?lesson=2`, `?lesson=3`으로 바로 접속
 - 교사: https://jeykorea-arch.github.io/physgame2/?teacher=1
 - `main` 브랜치에 push하면 GitHub Actions가 자동으로 lint·시험·빌드 후 재배포한다(`.github/workflows/deploy-pages.yml`).
-- 차시별 학생 접속 QR은 Firebase 설정 없이도 교사용 화면에서 즉시 사용할 수 있다. Firebase 설정이 없으면 접속·진행 현황 추적만 꺼지며, 켜는 방법은 `firebase/README.md` 참고.
+- Firebase가 연결된 교사용 화면에서는 **실시간 수업 열기** 뒤에만 추적용 학생 QR을 표시한다. 학생은 차시별로 수업용 별칭을 확인하고, 확정 즉시 교사용 명단에 나타난다. Firebase 설정이 없는 빌드의 직접 접속 QR은 비실시간 보조 경로이며, 켜는 방법은 `firebase/README.md` 참고.
+- 학생 화면 상단의 **처음부터 다시 시작**은 현재 차시의 진행·답안·출구 결과를 지우되 수업용 별칭과 실시간 수업 연결은 유지한다.
 
 상위 PRD·데이터 계약·QA 기준은 이 저장소가 아니라 `physgame2/docs/`, `physgame2/data/`, `physgame2/qa/`(별도 로컬 작업 폴더)에 있다. 이 저장소는 그중 배포 가능한 웹앱만 담는다.
 
